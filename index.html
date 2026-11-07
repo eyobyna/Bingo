@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="color-scheme" content="dark">
+<title>Bingo</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --hall:#2A1B3D;
+  --hall-deep:#1D1230;
+  --paper:#EAF4EC;
+  --ink:#1B1B2F;
+  --dauber:#E6007E;
+  --ball:#FFC93C;
+  --muted:#B9A9D1;
+  --win:#14A76C;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--hall-deep);color:var(--paper);font-family:'Nunito',system-ui,sans-serif;font-weight:600}
+body{display:flex;justify-content:center}
+#app{width:100%;max-width:480px;min-height:100%;padding:14px 14px 22px;display:flex;flex-direction:column;gap:14px;background:var(--hall)}
+
+/* caller */
+.caller{display:flex;align-items:center;gap:14px}
+.ball{
+  width:96px;height:96px;flex:none;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#FFE79A 0,var(--ball) 55%,#E0A41A 100%);
+  color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-family:'Bowlby One',sans-serif;line-height:1;box-shadow:0 6px 0 #9A6B00;
+}
+.ball small{font-size:20px}
+.ball b{font-size:38px;font-weight:400}
+.ball.empty{background:var(--hall-deep);box-shadow:none;border:3px dashed var(--muted);color:var(--muted);font-size:13px;font-family:'Nunito',sans-serif;font-weight:800;text-align:center}
+.ball.pop{animation:pop .35s ease-out}
+@keyframes pop{0%{transform:scale(.6)}70%{transform:scale(1.08)}100%{transform:scale(1)}}
+.callinfo{flex:1;min-width:0}
+.callinfo .count{font-size:14px;color:var(--muted);margin-bottom:6px}
+.recent{display:flex;gap:6px;flex-wrap:wrap;min-height:30px}
+.recent span{background:var(--hall-deep);border:2px solid var(--ball);color:var(--ball);border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800}
+
+/* card */
+.card{background:var(--paper);color:var(--ink);border-radius:14px;padding:10px;box-shadow:0 8px 0 var(--hall-deep)}
+.head,.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.head{margin-bottom:6px}
+.head div{font-family:'Bowlby One',sans-serif;font-size:26px;text-align:center;color:var(--dauber)}
+.cell{
+  position:relative;aspect-ratio:1;border:0;border-radius:10px;background:#fff;color:var(--ink);
+  font-family:inherit;font-weight:800;font-size:clamp(18px,6vw,26px);cursor:pointer;
+  box-shadow:inset 0 0 0 2px #CFE0D3;transition:transform .08s;
+}
+.cell:active{transform:scale(.94)}
+.cell.marked{background:var(--dauber);color:#fff;box-shadow:none}
+.cell.marked::after{content:"";position:absolute;inset:7px;border-radius:50%;border:3px solid rgba(255,255,255,.55)}
+.cell.free{font-size:13px;background:var(--ball);box-shadow:none}
+.cell.win{background:var(--win);color:#fff}
+.cell.called:not(.marked){box-shadow:inset 0 0 0 3px var(--ball)}
+
+/* controls */
+.status{min-height:24px;text-align:center;font-weight:800}
+.status.bad{color:#FF8FA3}
+.status.good{color:var(--ball)}
+.row{display:flex;gap:10px}
+button.btn{
+  flex:1;border:0;border-radius:14px;padding:14px 10px;font:inherit;font-weight:800;font-size:16px;cursor:pointer;
+  background:var(--hall-deep);color:var(--paper);box-shadow:0 4px 0 #0E0820;
+}
+button.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #0E0820}
+button.btn.bingo{flex:2;background:var(--dauber);color:#fff;font-family:'Bowlby One',sans-serif;font-weight:400;font-size:24px;box-shadow:0 5px 0 #8A004B}
+button.btn:disabled{opacity:.45}
+.speed{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:14px}
+.speed input{flex:1;accent-color:var(--dauber)}
+.name{color:var(--muted);font-size:14px;text-align:center}
+@media (prefers-reduced-motion:reduce){.ball.pop{animation:none}.cell{transition:none}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="name" id="who">Bingo</div>
+
+  <div class="caller">
+    <div class="ball empty" id="ball">Press<br>Start</div>
+    <div class="callinfo">
+      <div class="count" id="count">0 of 75 called</div>
+      <div class="recent" id="recent"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="head"><div>B</div><div>I</div><div>N</div><div>G</div><div>O</div></div>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <div class="status" id="status"></div>
+
+  <div class="speed">
+    <span>Slow</span>
+    <input type="range" id="speed" min="2" max="8" value="5" aria-label="Call speed">
+    <span>Fast</span>
+  </div>
+
+  <div class="row">
+    <button class="btn" id="startBtn">Start</button>
+    <button class="btn bingo" id="bingoBtn" disabled>BINGO!</button>
+  </div>
+  <div class="row">
+    <button class="btn" id="nextBtn" disabled>Call next ball</button>
+    <button class="btn" id="newBtn">New card</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const tg = window.Telegram && Telegram.WebApp;
+  if (tg) {
+    tg.ready(); tg.expand();
+    try { tg.setHeaderColor('#2A1B3D'); tg.setBackgroundColor('#2A1B3D'); } catch(e){}
+    const u = tg.initDataUnsafe && tg.initDataUnsafe.user;
+    if (u) document.getElementById('who').textContent = 'Good luck, ' + u.first_name + '!';
+  }
+  const buzz = (t) => { try { tg && tg.HapticFeedback.notificationOccurred(t); } catch(e){} };
+  const tap  = () => { try { tg && tg.HapticFeedback.impactOccurred('light'); } catch(e){} };
+
+  const $ = id => document.getElementById(id);
+  const LETTERS = 'BINGO';
+  let card, marked, called, order, timer, running, over;
+
+  function rangeFor(col){ const s = col*15+1; return Array.from({length:15},(_,i)=>s+i); }
+  function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+  function letterFor(n){ return LETTERS[Math.floor((n-1)/15)]; }
+
+  function newGame(){
+    clearInterval(timer); running = false; over = false;
+    // card[row][col]
+    const cols = [0,1,2,3,4].map(c => shuffle(rangeFor(c)).slice(0,5));
+    card = Array.from({length:5},(_,r)=>cols.map(col=>col[r]));
+    card[2][2] = 0; // free space
+    marked = Array.from({length:5},(_,r)=>Array.from({length:5},(_,c)=>r===2&&c===2));
+    called = new Set();
+    order = shuffle(Array.from({length:75},(_,i)=>i+1));
+    renderCard(); renderCaller(null);
+    setStatus('');
+    $('startBtn').textContent = 'Start'; $('startBtn').disabled = false;
+    $('nextBtn').disabled = true; $('bingoBtn').disabled = true;
+  }
+
+  function renderCard(winLine){
+    const g = $('grid'); g.innerHTML = '';
+    for(let r=0;r<5;r++) for(let c=0;c<5;c++){
+      const b = document.createElement('button');
+      const n = card[r][c];
+      b.className = 'cell';
+      if(n===0){ b.classList.add('free'); b.textContent = 'FREE'; }
+      else { b.textContent = n; if(called.has(n)) b.classList.add('called'); }
+      if(marked[r][c] && n!==0) b.classList.add('marked');
+      if(winLine && winLine.some(([wr,wc])=>wr===r&&wc===c)) b.classList.add('win');
+      b.addEventListener('click',()=>{
+        if(n===0||over) return;
+        marked[r][c] = !marked[r][c]; tap(); renderCard();
+      });
+      g.appendChild(b);
+    }
+  }
+
+  function renderCaller(n){
+    const ball = $('ball');
+    if(n===null){
+      ball.className = 'ball empty'; ball.innerHTML = 'Press<br>Start';
+    } else {
+      ball.className = 'ball'; ball.innerHTML = '<small>'+letterFor(n)+'</small><b>'+n+'</b>';
+      void ball.offsetWidth; ball.classList.add('pop');
+    }
+    $('count').textContent = called.size + ' of 75 called';
+    const hist = Array.from(called).slice(-6,-1).reverse();
+    $('recent').innerHTML = hist.map(h=>'<span>'+h+'</span>').join('');
+  }
+
+  function callNext(){
+    if(over) return;
+    if(called.size>=75){ endGame(); setStatus('All 75 balls called. Start a new card to play again.'); return; }
+    const n = order[called.size];
+    called.add(n);
+    renderCaller(n); renderCard();
+    tap();
+  }
+
+  function delay(){ return (10 - Number($('speed').value)) * 1000 * 0.9 + 800; }
+  function startTimer(){ clearInterval(timer); timer = setInterval(callNext, delay()); }
+
+  function findWin(){
+    const ok = (r,c) => marked[r][c] && (card[r][c]===0 || called.has(card[r][c]));
+    const lines = [];
+    for(let i=0;i<5;i++){
+      lines.push([0,1,2,3,4].map(k=>[i,k]));
+      lines.push([0,1,2,3,4].map(k=>[k,i]));
+    }
+    lines.push([0,1,2,3,4].map(k=>[k,k]));
+    lines.push([0,1,2,3,4].map(k=>[k,4-k]));
+    return lines.find(l=>l.every(([r,c])=>ok(r,c))) || null;
+  }
+
+  function endGame(){
+    over = true; clearInterval(timer); running = false;
+    $('startBtn').disabled = true; $('nextBtn').disabled = true; $('bingoBtn').disabled = true;
+  }
+
+  function setStatus(t, cls){ const s=$('status'); s.textContent=t; s.className='status '+(cls||''); }
+
+  $('startBtn').addEventListener('click',()=>{
+    if(over) return;
+    if(!running){
+      running = true; $('startBtn').textContent = 'Pause';
+      $('nextBtn').disabled = false; $('bingoBtn').disabled = false;
+      if(called.size===0) callNext();
+      startTimer();
+    } else {
+      running = false; clearInterval(timer); $('startBtn').textContent = 'Resume';
+    }
+  });
+  $('nextBtn').addEventListener('click',()=>{ callNext(); if(running) startTimer(); });
+  $('speed').addEventListener('input',()=>{ if(running) startTimer(); });
+  $('newBtn').addEventListener('click',newGame);
+
+  $('bingoBtn').addEventListener('click',()=>{
+    if(over) return;
+    const line = findWin();
+    if(line){
+      endGame(); renderCard(line);
+      setStatus('Bingo! You won on ball ' + called.size + '.','good');
+      buzz('success');
+    } else {
+      setStatus('Not yet. A full line of called numbers is needed.','bad');
+      buzz('error');
+    }
+  });
+
+  newGame();
+})();
+</script>
+</body>
+</html>
