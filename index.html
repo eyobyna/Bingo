@@ -75,12 +75,21 @@ button.btn:disabled{opacity:.45}
 .speed{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:14px}
 .speed input{flex:1;accent-color:var(--dauber)}
 .name{color:var(--muted);font-size:14px;text-align:center}
+.brand{text-align:center;line-height:1.2}
+.brand-am{font-size:34px;font-weight:800;color:var(--ball)}
+.brand-motto{font-size:16px;color:var(--paper);margin-top:2px}
+.brand-motto-en{font-size:13px;color:var(--muted);margin-top:2px}
 @media (prefers-reduced-motion:reduce){.ball.pop{animation:none}.cell{transition:none}}
 </style>
 </head>
 <body>
 <div id="app">
-  <div class="name" id="who">Bingo</div>
+  <div class="brand">
+    <div class="brand-am">መዝናኛ ቢንጎ</div>
+    <div class="brand-motto">እየተዝናኑ ያሸንፉ</div>
+    <div class="brand-motto-en">Win while having fun!</div>
+  </div>
+  <div class="name" id="who">Meznagna Bingo</div>
 
   <div class="caller">
     <div class="ball empty" id="ball">Press<br>Start</div>
