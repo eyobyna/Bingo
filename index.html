@@ -4,117 +4,111 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="color-scheme" content="dark">
-<title>Meznagna Bingo</title>
+<title>Meznagna Bingo | መዝናኛ ቢንጎ</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg-gradient: linear-gradient(135deg, #1A0B2E 0%, #2D154B 50%, #150824 100%);
-  --card-bg: rgba(45, 27, 75, 0.7);
-  --card-border: rgba(255, 215, 0, 0.2);
-  --paper: #EAF4EC; --ink: #1B1B2F;
-  --dauber: #E6007E; --ball: #FFC93C; --muted: #B9A9D1; --win: #14A76C;
-  --btn-green: linear-gradient(135deg, #00B074 0%, #008F5D 100%);
-  --btn-blue: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+  --brand-blue: #0066FF;
+  --brand-blue-dark: #004DB3;
+  --brand-gold: #FFC93C;
+  --brand-gold-light: #FFE79A;
+  --paper: #EAF4EC;
+  --ink: #1B1B2F;
+  --dauber: #E6007E;
+  --muted: #B9A9D1;
+  --win: #14A76C;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%;background:#150824;color:var(--paper);font-family:'Nunito',system-ui,sans-serif;font-weight:600}
+html,body{margin:0;height:100%;background:var(--brand-blue);color:var(--paper);font-family:'Nunito',system-ui,sans-serif;font-weight:600}
 body{display:flex;justify-content:center}
 [hidden]{display:none!important}
-#app{width:100%;max-width:480px;height:100dvh;padding:12px 16px 70px;display:flex;flex-direction:column;gap:12px;background:var(--bg-gradient);overflow-y:auto}
+#app{width:100%;max-width:480px;height:100dvh;padding:12px 16px 70px;display:flex;flex-direction:column;gap:12px;background:var(--brand-blue);overflow-y:auto}
 
 .header-top{display:flex;justify-content:space-between;align-items:center;padding:4px 0}
-.brand-title{font-family:'Bowlby One',sans-serif;font-size:20px;color:var(--ball)}
-.rules-btn{background:rgba(255,255,255,0.1);border:1px solid var(--card-border);color:var(--paper);padding:6px 12px;border-radius:20px;font-size:12px;cursor:pointer}
+.brand-title{font-family:'Bowlby One',sans-serif;font-size:18px;color:var(--brand-gold)}
+.rules-btn{background:rgba(255,255,255,0.15);border:1px solid var(--brand-gold);color:var(--paper);padding:6px 12px;border-radius:20px;font-size:12px;cursor:pointer}
 
-.welcome-box{text-align:center;padding:15px 0}
-.welcome-title{font-size:22px;font-weight:900;color:var(--paper)}
-.welcome-title span{color:var(--ball)}
+.welcome-box{text-align:center;padding:10px 0}
+.brand-am{font-size:24px;font-weight:900;color:var(--brand-gold);font-family:'Bowlby One',sans-serif}
+.brand-motto{font-size:14px;color:var(--paper);margin-top:2px}
+.brand-motto-en{font-size:12px;color:var(--brand-gold-light);margin-top:1px}
 
-.stake-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:14px;box-shadow:0 8px 32px rgba(0,0,0,0.3);backdrop-filter:blur(10px)}
-.stake-title{font-size:15px;font-weight:800;color:var(--ball);text-align:center;margin-bottom:4px}
-.stake-btn{width:100%;border:0;border-radius:14px;padding:16px;font:inherit;font-weight:800;font-size:16px;cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 15px rgba(0,0,0,0.2)}
-.stake-btn.play10{background:var(--btn-green)}
-.stake-btn.play20{background:var(--btn-blue)}
+.stake-card{background:var(--brand-blue-dark);border:2px solid var(--brand-gold);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:14px;box-shadow:0 8px 24px rgba(0,0,0,0.2)}
+.stake-title{font-size:16px;font-weight:800;color:var(--brand-gold);text-align:center}
+.stake-btn{width:100%;border:0;border-radius:14px;padding:16px;font:inherit;font-weight:800;font-size:16px;cursor:pointer;color:var(--ink);background:var(--brand-gold);display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 0 #9A6B00}
 
-.stats-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:14px;text-align:center}
-.stat-item .val{font-size:20px;font-weight:900;color:var(--ball)}
-.stat-item .lbl{font-size:12px;color:var(--muted)}
-
-/* Bottom Nav Bar matching Beteseb Bingo */
-.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#130620;border-top:1px solid rgba(255,255,255,0.08);display:flex;justify-content:space-around;padding:10px 0;z-index:100}
+/* Bottom Nav Bar */
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#003D99;border-top:1px solid rgba(255,255,255,0.15);display:flex;justify-content:space-around;padding:10px 0;z-index:100}
 .nav-item{background:none;border:0;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;font-weight:800;cursor:pointer}
-.nav-item.active{color:var(--ball)}
+.nav-item.active{color:var(--brand-gold)}
 .nav-item svg{width:22px;height:22px;fill:currentColor}
 
 /* Game & Lobby screens */
-.infobar{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted);font-weight:800}
-.infobar #timer{color:var(--ball);font-size:15px}
+.infobar{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--brand-gold-light);font-weight:800}
+.infobar #timer{color:var(--brand-gold);font-size:15px}
 .screen{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
 
 /* Caller */
 .caller{display:flex;align-items:center;gap:14px;flex:none}
-.ball{width:68px;height:68px;flex:none;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFE79A 0,var(--ball) 55%,#E0A41A 100%);color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Bowlby One',sans-serif;line-height:1;box-shadow:0 4px 0 #9A6B00}
+.ball{width:68px;height:68px;flex:none;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFE79A 0,var(--brand-gold) 55%,#E0A41A 100%);color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Bowlby One',sans-serif;line-height:1;box-shadow:0 4px 0 #9A6B00}
 .ball small{font-size:14px}
 .ball b{font-size:26px;font-weight:400}
-.ball.empty{background:var(--card-bg);box-shadow:none;border:2px dashed var(--muted);color:var(--muted);font-size:11px;font-family:'Nunito',sans-serif;font-weight:800;text-align:center}
-.ball.pop{animation:pop .35s ease-out}
-@keyframes pop{0%{transform:scale(.6)}70%{transform:scale(1.08)}100%{transform:scale(1)}}
+.ball.empty{background:var(--brand-blue-dark);box-shadow:none;border:2px dashed var(--muted);color:var(--muted);font-size:11px;font-weight:800;text-align:center}
 .recent{display:flex;gap:5px;flex-wrap:nowrap;min-height:28px}
-.recent span{background:var(--card-bg);border:2px solid var(--ball);color:var(--ball);border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800}
+.recent span{background:var(--brand-blue-dark);border:2px solid var(--brand-gold);color:var(--brand-gold);border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800}
 
 /* Card */
 .cardbox{width:100%;max-width:320px;align-self:center;flex:none}
-.card{background:var(--paper);color:var(--ink);border-radius:14px;padding:8px;box-shadow:0 5px 20px rgba(0,0,0,0.4);width:100%}
+.card{background:var(--paper);color:var(--ink);border-radius:14px;padding:8px;box-shadow:0 5px 20px rgba(0,0,0,0.3);width:100%}
 .head,.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
 .head{margin-bottom:4px}
 .head div{font-family:'Bowlby One',sans-serif;font-size:22px;text-align:center;color:var(--dauber);line-height:1.1}
 .cell{position:relative;aspect-ratio:1;border:0;border-radius:8px;background:#fff;color:var(--ink);font-weight:800;font-size:18px;display:flex;align-items:center;justify-content:center}
-.cell.called:not(.marked){box-shadow:inset 0 0 0 3px var(--ball)}
+.cell.called:not(.marked){box-shadow:inset 0 0 0 3px var(--brand-gold)}
 .cell.marked{background:var(--dauber);color:#fff}
-.cell.free{font-size:11px;background:var(--ball)}
-.cell.win{background:var(--win);color:#fff}
+.cell.free{font-size:11px;background:var(--brand-gold);color:var(--ink)}
 
-/* Lobby grid for multiple cartelas */
-.pgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:4px}
-.pc{border:1px solid var(--card-border);border-radius:10px;height:44px;background:var(--card-bg);color:var(--paper);font:inherit;font-weight:800;font-size:14px;cursor:pointer}
-.pc.taken{opacity:.3;cursor:not-allowed}
+/* Lobby 100 Cartelas grid */
+.pgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;padding:4px}
+.pc{border:1px solid rgba(255,255,255,0.2);border-radius:8px;height:40px;background:var(--brand-blue-dark);color:var(--paper);font:inherit;font-weight:800;font-size:13px;cursor:pointer}
+.pc.taken{opacity:.25;cursor:not-allowed}
 .pc.mine{background:var(--dauber);color:#fff;border-color:transparent}
 
 .row{display:flex;gap:8px;flex:none}
-button.btn{flex:1;border:0;border-radius:12px;padding:12px;font:inherit;font-weight:800;font-size:14px;cursor:pointer;background:var(--card-bg);color:var(--paper);border:1px solid var(--card-border)}
-button.btn.primary{background:var(--dauber);color:#fff;border:0}
+button.btn{flex:1;border:0;border-radius:12px;padding:12px;font:inherit;font-weight:800;font-size:14px;cursor:pointer;background:var(--brand-blue-dark);color:var(--paper);border:1px solid var(--brand-gold)}
+button.btn.primary{background:var(--brand-gold);color:var(--ink);border:0;box-shadow:0 4px 0 #9A6B00}
 button.btn.bingo{flex:2;background:var(--dauber);color:#fff;font-family:'Bowlby One',sans-serif;font-size:18px;border:0}
 </style>
 </head>
 <body>
 <div id="app">
   <div class="header-top">
-    <div class="brand-title">Meznagna Bingo</div>
-    <button class="rules-btn" id="rulesBtn">Rules</button>
+    <div class="brand-title">Meznagna Bingo | መዝናኛ ቢንጎ</div>
+    <button class="rules-btn" onclick="alert('• Play 10: 10 ETB per cartela.\n• Choose as many cartelas as your balance allows.\n• Mark numbers and press BINGO!')">Rules</button>
   </div>
 
   <!-- VIEWS -->
   <div id="view-game" class="screen">
     <div class="welcome-box">
-      <div class="welcome-title">Welcome to <span>Meznagna Bingo</span></div>
+      <div class="brand-am">መዝናኛ ቢንጎ</div>
+      <div class="brand-motto">እየተዝናኑ ያሸንፉ</div>
+      <div class="brand-motto-en">Win while having fun!</div>
     </div>
     <div class="stake-card">
-      <div class="stake-title">⚡ Choose Your Stake</div>
-      <button class="stake-btn play10" onclick="selectStake(10)">▶ Play 10 (10 ETB / Card)</button>
-      <button class="stake-btn play20" onclick="selectStake(20)">▶ Play 20 (20 ETB / Card)</button>
+      <div class="stake-title">⚡ Select Stake</div>
+      <button class="stake-btn" onclick="selectStake(10)">▶ Play 10 (10 ETB / Cartela)</button>
     </div>
-    <div class="stats-card">
-      <div class="stat-item"><div class="val">45,000+</div><div class="lbl">Active Players</div></div>
-      <div class="stat-item"><div class="val">60,000+</div><div class="lbl">Games Played</div></div>
+    <div style="text-align:center;color:var(--brand-gold-light);font-size:13px;margin-top:10px;">
+      💳 Your Balance: <span id="balanceDisplay">Loading...</span> ETB
     </div>
   </div>
 
   <div id="view-lobby" class="screen" hidden>
-    <div class="infobar"><span id="lobbyTitle">Select Cartelas</span><span id="timer"></span></div>
-    <div style="font-size:13px;color:var(--muted);text-align:center">Tap cards to select multiple cartelas. Price per card depends on your stake.</div>
+    <div class="infobar"><span id="lobbyTitle">Select Cartelas (1–100)</span><span id="timer"></span></div>
+    <div style="font-size:12px;color:var(--brand-gold-light);text-align:center">Pick as many cartelas as you want (10 ETB each).</div>
     <div class="pgrid" id="lobbyGrid"></div>
     <button class="btn primary" id="confirmBuyBtn">Confirm & Join Game</button>
   </div>
@@ -124,53 +118,47 @@ button.btn.bingo{flex:2;background:var(--dauber);color:#fff;font-family:'Bowlby 
     <div class="caller">
       <div class="ball empty" id="ball">Waiting</div>
       <div style="flex:1">
-        <div style="font-size:13px;color:var(--muted);margin-bottom:4px" id="count">0 of 75 called</div>
+        <div style="font-size:13px;color:var(--brand-gold-light);margin-bottom:4px" id="count">0 of 75 called</div>
         <div class="recent" id="recent"></div>
       </div>
     </div>
     <div class="cardbox" id="cardArea"></div>
     <div class="row">
-      <button class="btn" id="autoBtn">Auto: Off</button>
+      <button class="btn" id="autoBtn" onclick="toggleAuto()">Auto: Off</button>
       <button class="btn bingo" id="bingoBtn" onclick="pressBingo()" disabled>BINGO!</button>
     </div>
   </div>
 
   <div id="view-history" class="screen" hidden>
-    <h2 style="font-size:18px;color:var(--ball);margin:0">Game History</h2>
-    <div class="stats-card">
-      <div class="stat-item"><div class="val" id="histTotal">0</div><div class="lbl">Total Games Played</div></div>
-    </div>
+    <h2 style="font-size:18px;color:var(--brand-gold);margin:0">Game History</h2>
+    <div style="color:var(--brand-gold-light);font-size:13px">Your previous rounds and results will appear here.</div>
   </div>
 
   <div id="view-wallet" class="screen" hidden>
-    <h2 style="font-size:18px;color:var(--ball);margin:0">Wallet & Balance</h2>
-    <div class="stats-card">
-      <div class="stat-item"><div class="val" id="walletBal">0.00 ETB</div><div class="lbl">Total Available Balance</div></div>
-    </div>
+    <h2 style="font-size:18px;color:var(--brand-gold);margin:0">Wallet & Balance</h2>
+    <div style="color:var(--brand-gold-light);font-size:13px" id="walletInfo">Loading balance...</div>
   </div>
 
   <div id="view-profile" class="screen" hidden>
-    <h2 style="font-size:18px;color:var(--ball);margin:0">Player Profile</h2>
-    <div class="stats-card">
-      <div class="stat-item"><div class="val" id="profName">Player</div><div class="lbl">Telegram User</div></div>
-    </div>
+    <h2 style="font-size:18px;color:var(--brand-gold);margin:0">Player Profile</h2>
+    <div style="color:var(--brand-gold-light);font-size:13px" id="profInfo">Loading profile...</div>
   </div>
 
   <!-- Bottom Nav -->
   <div class="bottom-nav">
-    <button class="nav-item active" onclick="switchTab('game')">
+    <button class="nav-item active" onclick="switchTab('game', event)">
       <svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm3-4c-.83 0-1.5-.67-1.5-1.5S17.67 8 18.5 8s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
       Game
     </button>
-    <button class="nav-item" onclick="switchTab('history')">
+    <button class="nav-item" onclick="switchTab('history', event)">
       <svg viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
       History
     </button>
-    <button class="nav-item" onclick="switchTab('wallet')">
+    <button class="nav-item" onclick="switchTab('wallet', event)">
       <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
       Wallet
     </button>
-    <button class="nav-item" onclick="switchTab('profile')">
+    <button class="nav-item" onclick="switchTab('profile', event)">
       <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
       Profile
     </button>
@@ -193,24 +181,26 @@ const app = initializeApp(FIREBASE_CONFIG);
 const db = getDatabase(app);
 
 const tg = window.Telegram && Telegram.WebApp;
+let initData = "";
 let me = "user_123", myName = "Player", currentStake = 10;
 let selectedCards = new Set();
 let cur = null, picks = {}, marks = {}, auto = false;
 
 if(tg){
   tg.ready(); tg.expand();
+  initData = tg.initData || "";
   if(tg.initDataUnsafe && tg.initDataUnsafe.user){
     me = String(tg.initDataUnsafe.user.id);
     myName = tg.initDataUnsafe.user.first_name || "Player";
   }
 }
-document.getElementById('profName').textContent = myName;
+document.getElementById('profInfo').textContent = `Name: ${myName} (ID: ${me})`;
 
-window.switchTab = function(tab){
+window.switchTab = function(tab, event){
   document.querySelectorAll('.screen').forEach(s => s.hidden = true);
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('view-' + tab).hidden = false;
-  event.currentTarget.classList.add('active');
+  if(event && event.currentTarget) event.currentTarget.classList.add('active');
 }
 
 window.selectStake = function(stake){
@@ -235,7 +225,7 @@ function cardFor(k){
 function initLobby(){
   const grid = document.getElementById('lobbyGrid');
   grid.innerHTML = '';
-  for(let i=1; i<=50; i++){
+  for(let i=1; i<=100; i++){
     const btn = document.createElement('button');
     btn.className = 'pc';
     btn.textContent = i;
@@ -252,31 +242,61 @@ function initLobby(){
   }
 }
 
-document.getElementById('confirmBuyBtn').onclick = () => {
+document.getElementById('confirmBuyBtn').onclick = async () => {
   if(selectedCards.size === 0){ alert("Please select at least one cartela."); return; }
-  // Switch to game play view and join room
-  document.getElementById('view-lobby').hidden = true;
-  document.getElementById('view-play').hidden = false;
-  startListeningGame();
+  
+  // Call PythonAnywhere backend API /buy endpoint
+  try {
+    const response = await fetch('https://Eyobyna.pythonanywhere.com/buy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        initData: initData,
+        stake: currentStake,
+        roundId: cur ? cur.id : 1,
+        cartelas: Array.from(selectedCards)
+      })
+    });
+    const result = await response.json();
+    if(result.ok){
+      document.getElementById('view-lobby').hidden = true;
+      document.getElementById('view-play').hidden = false;
+      startListeningGame();
+    } else {
+      alert(result.error || "Failed to buy cartelas.");
+    }
+  } catch(e) {
+    alert("Connection error while purchasing cartelas.");
+  }
 };
 
 function startListeningGame(){
   onValue(ref(db, `rooms/${currentStake}/current`), snapshot => {
     cur = snapshot.val();
     if(cur){
-      document.getElementById('roundLbl').textContent = `Round ${cur.id} (${currentStake} ETB)`;
+      document.getElementById('roundLbl').textContent = `Round ${cur.id} (Play 10)`;
     }
   });
 }
 
-// Speech Synthesis for calling out balls loud (e.g., "B 10")
-function speakBall(letter, number){
-  if('speechSynthesis' in window){
-    const utterance = new SpeechSynthesisUtterance(`${letter} ${number}`);
-    utterance.rate = 1.0;
-    window.speechSynthesis.speak(utterance);
+// Fetch user balance
+async function fetchBalance(){
+  try{
+    const res = await fetch('https://Eyobyna.pythonanywhere.com/balance', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ initData: initData })
+    });
+    const data = await res.json();
+    if(data.ok){
+      document.getElementById('balanceDisplay').textContent = data.balance;
+      document.getElementById('walletInfo').textContent = `Total Available Balance: ${data.balance} ETB`;
+    }
+  }catch(e){
+    document.getElementById('balanceDisplay').textContent = "---";
   }
 }
+fetchBalance();
 </script>
 </body>
 </html>
