@@ -59,7 +59,7 @@ body{display:flex;justify-content:center}
 .recent{display:flex;gap:5px;flex-wrap:nowrap;min-height:28px}
 .recent span{background:var(--hall-deep);border:2px solid var(--ball);color:var(--ball);border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800}
 
-/* Card */
+/* Card / Board */
 .cardbox{width:100%;max-width:320px;align-self:center;flex:none}
 .card{background:var(--paper);color:var(--ink);border-radius:14px;padding:8px;box-shadow:0 5px 20px rgba(0,0,0,0.3);width:100%}
 .head,.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
@@ -69,6 +69,13 @@ body{display:flex;justify-content:center}
 .cell.called:not(.marked){box-shadow:inset 0 0 0 3px var(--ball)}
 .cell.marked{background:var(--dauber);color:#fff}
 .cell.free{font-size:11px;background:var(--ball);color:var(--ink)}
+
+/* Board grid for spectators */
+.board{background:var(--paper);border-radius:14px;padding:8px;box-shadow:0 5px 20px rgba(0,0,0,0.3);display:grid;grid-template-columns:repeat(5,1fr);gap:3px}
+.board .bh{font-family:'Bowlby One',sans-serif;text-align:center;color:var(--dauber);font-size:18px}
+.board .bn{text-align:center;border-radius:6px;background:#fff;color:#9AA8A0;font-size:13px;font-weight:800;padding:6px 0}
+.board .bn.on{background:var(--ball);color:var(--ink)}
+.board .bn.last{background:var(--dauber);color:#fff}
 
 /* Lobby 100 Cartelas grid */
 .pgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;padding:4px}
@@ -86,7 +93,7 @@ button.btn.bingo{flex:2;background:var(--dauber);color:#fff;font-family:'Bowlby 
 <div id="app">
   <div class="header-top">
     <div class="brand-title">Meznagna Bingo | መዝናኛ ቢንጎ</div>
-    <button class="rules-btn" onclick="alert('• Play 10: 10 ETB per cartela.\n• Choose as many cartelas as your balance allows.\n• Mark numbers and press BINGO!')">Rules</button>
+    <button class="rules-btn" onclick="alert('• Play 10: 10 ETB per cartela.\n• Choose cartelas in the lobby or watch as a spectator.\n• Mark numbers and press BINGO!')">Rules</button>
   </div>
 
   <!-- VIEWS -->
@@ -106,14 +113,17 @@ button.btn.bingo{flex:2;background:var(--dauber);color:#fff;font-family:'Bowlby 
   </div>
 
   <div id="view-lobby" class="screen" hidden>
-    <div class="infobar"><span id="lobbyTitle">Select Cartelas (1–100)</span><span id="timer"></span></div>
-    <div style="font-size:12px;color:var(--muted);text-align:center">Pick as many cartelas as you want (10 ETB each).</div>
+    <div class="infobar"><span id="lobbyTitle">Select Cartelas (1–100)</span><span id="timer">00:00</span></div>
+    <div style="font-size:12px;color:var(--muted);text-align:center">Pick cartelas or watch as spectator when round starts.</div>
     <div class="pgrid" id="lobbyGrid"></div>
-    <button class="btn primary" id="confirmBuyBtn">Confirm & Join Game</button>
+    <div class="row">
+      <button class="btn" onclick="enterSpectatorMode()">Watch as Spectator</button>
+      <button class="btn primary" id="confirmBuyBtn">Confirm & Join</button>
+    </div>
   </div>
 
   <div id="view-play" class="screen" hidden>
-    <div class="infobar"><span id="roundLbl"></span><span id="timerPlay"></span></div>
+    <div class="infobar"><span id="roundLbl">Round 1</span><span id="timerPlay">Live</span></div>
     <div class="caller">
       <div class="ball empty" id="ball">Waiting</div>
       <div style="flex:1">
@@ -123,7 +133,7 @@ button.btn.bingo{flex:2;background:var(--dauber);color:#fff;font-family:'Bowlby 
     </div>
     <div class="cardbox" id="cardArea"></div>
     <div class="row">
-      <button class="btn" id="autoBtn" onclick="toggleAuto()">Auto: Off</button>
+      <button class="btn" id="spectateToggleBtn" onclick="toggleSpectatorView()">Board / Card</button>
       <button class="btn bingo" id="bingoBtn" onclick="pressBingo()" disabled>BINGO!</button>
     </div>
   </div>
@@ -150,7 +160,7 @@ button.btn.bingo{flex:2;background:var(--dauber);color:#fff;font-family:'Bowlby 
       Game
     </button>
     <button class="nav-item" onclick="switchTab('history', event)">
-      <svg viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
       History
     </button>
     <button class="nav-item" onclick="switchTab('wallet', event)">
@@ -183,7 +193,7 @@ const tg = window.Telegram && Telegram.WebApp;
 let initData = "";
 let me = "user_123", myName = "Player", currentStake = 10;
 let selectedCards = new Set();
-let cur = null;
+let cur = null, serverOffset = 0, isSpectator = false, showBoardView = true;
 
 if(tg){
   tg.ready(); tg.expand();
@@ -207,6 +217,7 @@ window.selectStake = function(stake){
   document.getElementById('view-game').hidden = true;
   document.getElementById('view-lobby').hidden = false;
   initLobby();
+  listenToRoom();
 }
 
 function initLobby(){
@@ -229,6 +240,44 @@ function initLobby(){
   }
 }
 
+// Listen to room current state and update lobby timer
+function listenToRoom(){
+  onValue(ref(db, '.info/serverTimeOffset'), s => { serverOffset = s.val() || 0; });
+  onValue(ref(db, `rooms/${currentStake}/current`), snapshot => {
+    cur = snapshot.val();
+    if(cur){
+      document.getElementById('roundLbl').textContent = `Round ${cur.id} (Play 10)`;
+      updateLobbyTimer();
+    }
+  });
+}
+
+function updateLobbyTimer(){
+  if(!cur || !document.getElementById('view-lobby').hidden === false) return;
+  const now = Date.now() + serverOffset;
+  const left = cur.lobbyEnd - now;
+  if(left <= 0){
+    document.getElementById('timer').textContent = "Starting...";
+    // Automatically transition to game view if lobby ends
+    document.getElementById('view-lobby').hidden = true;
+    document.getElementById('view-play').hidden = false;
+    startLiveGameLoop();
+  } else {
+    const s = Math.ceil(left / 1000);
+    const m = Math.floor(s / 60);
+    const rem = s % 60;
+    document.getElementById('timer').textContent = `${m}:${rem < 10 ? '0' : ''}${rem}`;
+    setTimeout(updateLobbyTimer, 1000);
+  }
+}
+
+window.enterSpectatorMode = function(){
+  isSpectator = true;
+  document.getElementById('view-lobby').hidden = true;
+  document.getElementById('view-play').hidden = false;
+  startLiveGameLoop();
+}
+
 document.getElementById('confirmBuyBtn').onclick = async () => {
   if(selectedCards.size === 0){ alert("Please select at least one cartela."); return; }
   
@@ -245,9 +294,10 @@ document.getElementById('confirmBuyBtn').onclick = async () => {
     });
     const result = await response.json();
     if(result.ok){
+      isSpectator = false;
       document.getElementById('view-lobby').hidden = true;
       document.getElementById('view-play').hidden = false;
-      startListeningGame();
+      startLiveGameLoop();
     } else {
       alert(result.error || "Failed to buy cartelas.");
     }
@@ -256,13 +306,63 @@ document.getElementById('confirmBuyBtn').onclick = async () => {
   }
 };
 
-function startListeningGame(){
+function startLiveGameLoop(){
   onValue(ref(db, `rooms/${currentStake}/current`), snapshot => {
     cur = snapshot.val();
-    if(cur){
-      document.getElementById('roundLbl').textContent = `Round ${cur.id} (Play 10)`;
+    if(cur && cur.seed){
+      const now = Date.now() + serverOffset;
+      const elapsed = now - cur.lobbyEnd;
+      const calledCount = elapsed < 0 ? 0 : Math.min(75, Math.floor(elapsed / cur.callMs) + 1);
+      renderCallerAndBoard(calledCount);
     }
   });
+}
+
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function shuffled(arr,rng){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+const seqCache={};
+function seqFor(seed){
+  return seqCache[seed]||(seqCache[seed]=shuffled(Array.from({length:75},(_,i)=>i+1),mulberry32(seed)));
+}
+function letterFor(n){return 'BINGO'[Math.floor((n-1)/15)];}
+
+function renderCallerAndBoard(n){
+  if(!cur || !cur.seed) return;
+  const seq = seqFor(cur.seed);
+  const ball = document.getElementById('ball');
+  if(n === 0){
+    ball.className = 'ball empty'; ball.innerHTML = 'Waiting';
+  } else {
+    const num = seq[n-1];
+    ball.className = 'ball'; ball.innerHTML = `<small>${letterFor(num)}</small><b>${num}</b>`;
+  }
+  document.getElementById('count').textContent = `${n} of 75 called`;
+  document.getElementById('recent').innerHTML = seq.slice(Math.max(0, n-6), Math.max(0, n-1)).reverse().map(x=>`<span>${x}</span>`).join('');
+  
+  // Render Board for spectators
+  const area = document.getElementById('cardArea');
+  area.innerHTML = '';
+  const calledSet = new Set(seq.slice(0, n));
+  const lastNum = n > 0 ? seq[n-1] : 0;
+
+  const b = document.createElement('div');
+  b.className = 'board';
+  for(const L of 'BINGO'){
+    const d = document.createElement('div'); d.className = 'bh'; d.textContent = L; b.appendChild(d);
+  }
+  for(let i=0; i<15; i++) for(let c=0; c<5; c++){
+    const num = c*15 + i + 1;
+    const d = document.createElement('div');
+    d.className = 'bn' + (calledSet.has(num) ? ' on' : '') + (num === lastNum ? ' last' : '');
+    d.textContent = num;
+    b.appendChild(d);
+  }
+  area.appendChild(b);
+  document.getElementById('bingoBtn').disabled = isSpectator;
+}
+
+window.toggleSpectatorView = function(){
+  showBoardView = !showBoardView;
 }
 
 async function fetchBalance(){
