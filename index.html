@@ -8,169 +8,221 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
 <style>
 :root{
-  --hall:#2A1B3D; --hall-deep:#1D1230; --paper:#EAF4EC; --ink:#1B1B2F;
-  --dauber:#E6007E; --ball:#FFC93C; --muted:#B9A9D1; --win:#14A76C;
+  --bg-gradient: linear-gradient(135deg, #1A0B2E 0%, #2D154B 50%, #150824 100%);
+  --card-bg: rgba(45, 27, 75, 0.7);
+  --card-border: rgba(255, 215, 0, 0.2);
+  --paper: #EAF4EC; --ink: #1B1B2F;
+  --dauber: #E6007E; --ball: #FFC93C; --muted: #B9A9D1; --win: #14A76C;
+  --btn-green: linear-gradient(135deg, #00B074 0%, #008F5D 100%);
+  --btn-blue: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%;background:var(--hall-deep);color:var(--paper);font-family:'Nunito',system-ui,sans-serif;font-weight:600}
+html,body{margin:0;height:100%;background:#150824;color:var(--paper);font-family:'Nunito',system-ui,sans-serif;font-weight:600}
 body{display:flex;justify-content:center}
 [hidden]{display:none!important}
-#app{width:100%;max-width:480px;height:100dvh;padding:8px 12px 12px;display:flex;flex-direction:column;gap:8px;background:var(--hall)}
+#app{width:100%;max-width:480px;height:100dvh;padding:12px 16px 70px;display:flex;flex-direction:column;gap:12px;background:var(--bg-gradient);overflow-y:auto}
 
-.brand{text-align:center;line-height:1.2}
-.brand-am{font-size:26px;font-weight:800;color:var(--ball)}
-.brand-motto{font-size:14px;color:var(--paper);margin-top:1px}
-.brand-motto-en{font-size:12px;color:var(--muted);margin-top:1px}
+.header-top{display:flex;justify-content:space-between;align-items:center;padding:4px 0}
+.brand-title{font-family:'Bowlby One',sans-serif;font-size:20px;color:var(--ball)}
+.rules-btn{background:rgba(255,255,255,0.1);border:1px solid var(--card-border);color:var(--paper);padding:6px 12px;border-radius:20px;font-size:12px;cursor:pointer}
 
+.welcome-box{text-align:center;padding:15px 0}
+.welcome-title{font-size:22px;font-weight:900;color:var(--paper)}
+.welcome-title span{color:var(--ball)}
+
+.stake-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:14px;box-shadow:0 8px 32px rgba(0,0,0,0.3);backdrop-filter:blur(10px)}
+.stake-title{font-size:15px;font-weight:800;color:var(--ball);text-align:center;margin-bottom:4px}
+.stake-btn{width:100%;border:0;border-radius:14px;padding:16px;font:inherit;font-weight:800;font-size:16px;cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 15px rgba(0,0,0,0.2)}
+.stake-btn.play10{background:var(--btn-green)}
+.stake-btn.play20{background:var(--btn-blue)}
+
+.stats-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:14px;text-align:center}
+.stat-item .val{font-size:20px;font-weight:900;color:var(--ball)}
+.stat-item .lbl{font-size:12px;color:var(--muted)}
+
+/* Bottom Nav Bar matching Beteseb Bingo */
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#130620;border-top:1px solid rgba(255,255,255,0.08);display:flex;justify-content:space-around;padding:10px 0;z-index:100}
+.nav-item{background:none;border:0;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;font-weight:800;cursor:pointer}
+.nav-item.active{color:var(--ball)}
+.nav-item svg{width:22px;height:22px;fill:currentColor}
+
+/* Game & Lobby screens */
 .infobar{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted);font-weight:800}
 .infobar #timer{color:var(--ball);font-size:15px}
-.greet{text-align:center;font-weight:800;font-size:15px;min-height:20px}
+.screen{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
 
-.screen{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
-
-/* caller */
+/* Caller */
 .caller{display:flex;align-items:center;gap:14px;flex:none}
 .ball{width:68px;height:68px;flex:none;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFE79A 0,var(--ball) 55%,#E0A41A 100%);color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Bowlby One',sans-serif;line-height:1;box-shadow:0 4px 0 #9A6B00}
 .ball small{font-size:14px}
 .ball b{font-size:26px;font-weight:400}
-.ball.empty{background:var(--hall-deep);box-shadow:none;border:3px dashed var(--muted);color:var(--muted);font-size:11px;font-family:'Nunito',sans-serif;font-weight:800;text-align:center}
+.ball.empty{background:var(--card-bg);box-shadow:none;border:2px dashed var(--muted);color:var(--muted);font-size:11px;font-family:'Nunito',sans-serif;font-weight:800;text-align:center}
 .ball.pop{animation:pop .35s ease-out}
 @keyframes pop{0%{transform:scale(.6)}70%{transform:scale(1.08)}100%{transform:scale(1)}}
-.callinfo{flex:1;min-width:0}
-.callinfo .count{font-size:13px;color:var(--muted);margin-bottom:4px}
 .recent{display:flex;gap:5px;flex-wrap:nowrap;min-height:28px}
-.recent span{background:var(--hall-deep);border:2px solid var(--ball);color:var(--ball);border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800}
+.recent span{background:var(--card-bg);border:2px solid var(--ball);color:var(--ball);border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800}
 
-/* card */
-.cardbox{width:clamp(250px,calc((100dvh - 350px) / 1.2),100%);align-self:center;flex:none}
-.cardbox.sm{width:min(100%,300px)}
-.card{background:var(--paper);color:var(--ink);border-radius:14px;padding:8px;box-shadow:0 5px 0 var(--hall-deep);container-type:inline-size;width:100%}
+/* Card */
+.cardbox{width:100%;max-width:320px;align-self:center;flex:none}
+.card{background:var(--paper);color:var(--ink);border-radius:14px;padding:8px;box-shadow:0 5px 20px rgba(0,0,0,0.4);width:100%}
 .head,.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
 .head{margin-bottom:4px}
-.head div{font-family:'Bowlby One',sans-serif;font-size:clamp(18px,8cqw,28px);text-align:center;color:var(--dauber);line-height:1.1}
-.cell{position:relative;aspect-ratio:1;border:0;border-radius:10px;background:#fff;color:var(--ink);font-family:inherit;font-weight:800;font-size:clamp(14px,7.5cqw,26px);box-shadow:inset 0 0 0 2px #CFE0D3;display:flex;align-items:center;justify-content:center;padding:0}
-button.cell{cursor:pointer;transition:transform .08s}
-button.cell:active{transform:scale(.94)}
+.head div{font-family:'Bowlby One',sans-serif;font-size:22px;text-align:center;color:var(--dauber);line-height:1.1}
+.cell{position:relative;aspect-ratio:1;border:0;border-radius:8px;background:#fff;color:var(--ink);font-weight:800;font-size:18px;display:flex;align-items:center;justify-content:center}
 .cell.called:not(.marked){box-shadow:inset 0 0 0 3px var(--ball)}
-.cell.marked{background:var(--dauber);color:#fff;box-shadow:none}
-.cell.marked::after{content:"";position:absolute;inset:18%;border-radius:50%;border:3px solid rgba(255,255,255,.55)}
-.cell.free{font-size:clamp(10px,4cqw,13px);background:var(--ball);box-shadow:none}
+.cell.marked{background:var(--dauber);color:#fff}
+.cell.free{font-size:11px;background:var(--ball)}
 .cell.win{background:var(--win);color:#fff}
-.cardlabel{text-align:center;color:var(--muted);font-size:13px;margin-top:8px}
 
-/* called-number board */
-.board{background:var(--paper);border-radius:14px;padding:8px;box-shadow:0 5px 0 var(--hall-deep);display:grid;grid-template-columns:repeat(5,1fr);gap:3px;container-type:inline-size}
-.board .bh{font-family:'Bowlby One',sans-serif;text-align:center;color:var(--dauber);font-size:18px}
-.board .bn{text-align:center;border-radius:6px;background:#fff;color:#9AA8A0;font-size:clamp(11px,4.5cqw,15px);font-weight:800;padding:2px 0}
-.board .bn.on{background:var(--ball);color:var(--ink)}
-.board .bn.last{background:var(--dauber);color:#fff}
+/* Lobby grid for multiple cartelas */
+.pgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:4px}
+.pc{border:1px solid var(--card-border);border-radius:10px;height:44px;background:var(--card-bg);color:var(--paper);font:inherit;font-weight:800;font-size:14px;cursor:pointer}
+.pc.taken{opacity:.3;cursor:not-allowed}
+.pc.mine{background:var(--dauber);color:#fff;border-color:transparent}
 
-/* lobby */
-.hint{color:var(--muted);font-size:13px;text-align:center}
-.pgrid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;padding:2px}
-.pc{border:0;border-radius:10px;height:38px;background:var(--paper);color:var(--ink);font:inherit;font-weight:800;font-size:14px;cursor:pointer}
-.pc.taken{opacity:.28;cursor:not-allowed}
-.pc.mine{background:var(--dauber);color:#fff}
-
-/* controls */
-.status{min-height:20px;text-align:center;font-weight:800;font-size:14px;flex:none}
-.status.bad{color:#FF8FA3}
-.status.good{color:var(--ball)}
 .row{display:flex;gap:8px;flex:none}
-button.btn{flex:1;border:0;border-radius:12px;padding:12px 4px;font:inherit;font-weight:800;font-size:14px;cursor:pointer;background:var(--hall-deep);color:var(--paper);box-shadow:0 4px 0 #0E0820}
-button.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #0E0820}
-button.btn.bingo{flex:2.2;background:var(--dauber);color:#fff;font-family:'Bowlby One',sans-serif;font-weight:400;font-size:20px;box-shadow:0 4px 0 #8A004B}
-button.btn.primary{background:var(--dauber);color:#fff;box-shadow:0 4px 0 #8A004B}
-button.btn:disabled{opacity:.45}
-
-/* bottom sheet + setup */
-#sheet{position:fixed;inset:0;background:rgba(10,5,20,.8);display:flex;align-items:flex-end;justify-content:center;z-index:5}
-.sheetbox{width:100%;max-width:480px;background:var(--hall);border-radius:18px 18px 0 0;padding:14px 14px 18px;display:flex;flex-direction:column;gap:10px;align-items:stretch}
-.sheetbox h3{margin:0;text-align:center;font-size:18px}
-#setup,#wait{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;color:var(--muted);padding:20px}
-#setup b{color:var(--ball)}
-@media (prefers-reduced-motion:reduce){.ball.pop{animation:none}button.cell{transition:none}}
+button.btn{flex:1;border:0;border-radius:12px;padding:12px;font:inherit;font-weight:800;font-size:14px;cursor:pointer;background:var(--card-bg);color:var(--paper);border:1px solid var(--card-border)}
+button.btn.primary{background:var(--dauber);color:#fff;border:0}
+button.btn.bingo{flex:2;background:var(--dauber);color:#fff;font-family:'Bowlby One',sans-serif;font-size:18px;border:0}
 </style>
 </head>
 <body>
 <div id="app">
-  <div class="brand">
-    <div class="brand-am">መዝናኛ ቢንጎ</div>
-    <div class="brand-motto">እየተዝናኑ ያሸንፉ</div>
-    <div class="brand-motto-en">Win while having fun!</div>
+  <div class="header-top">
+    <div class="brand-title">Meznagna Bingo</div>
+    <button class="rules-btn" id="rulesBtn">Rules</button>
   </div>
 
-  <div id="setup" hidden>
-    <b>Almost ready</b>
-    <div>Paste your Firebase settings into <b>index.html</b> (the FIREBASE_CONFIG block near the top of the script), then reload.</div>
-  </div>
-  <div id="wait">Connecting…</div>
-
-  <div id="main" hidden style="display:contents">
-    <div class="infobar"><span id="roundLbl"></span><span id="timer"></span></div>
-    <div class="greet" id="greet"></div>
-
-    <div class="screen" id="lobby" hidden>
-      <div id="lobbyBody"></div>
+  <!-- VIEWS -->
+  <div id="view-game" class="screen">
+    <div class="welcome-box">
+      <div class="welcome-title">Welcome to <span>Meznagna Bingo</span></div>
     </div>
+    <div class="stake-card">
+      <div class="stake-title">⚡ Choose Your Stake</div>
+      <button class="stake-btn play10" onclick="selectStake(10)">▶ Play 10 (10 ETB / Card)</button>
+      <button class="stake-btn play20" onclick="selectStake(20)">▶ Play 20 (20 ETB / Card)</button>
+    </div>
+    <div class="stats-card">
+      <div class="stat-item"><div class="val">45,000+</div><div class="lbl">Active Players</div></div>
+      <div class="stat-item"><div class="val">60,000+</div><div class="lbl">Games Played</div></div>
+    </div>
+  </div>
 
-    <div class="screen" id="game" hidden>
-      <div class="caller">
-        <div class="ball empty" id="ball">Waiting</div>
-        <div class="callinfo">
-          <div class="count" id="count">0 of 75 called</div>
-          <div class="recent" id="recent"></div>
-        </div>
+  <div id="view-lobby" class="screen" hidden>
+    <div class="infobar"><span id="lobbyTitle">Select Cartelas</span><span id="timer"></span></div>
+    <div style="font-size:13px;color:var(--muted);text-align:center">Tap cards to select multiple cartelas. Price per card depends on your stake.</div>
+    <div class="pgrid" id="lobbyGrid"></div>
+    <button class="btn primary" id="confirmBuyBtn">Confirm & Join Game</button>
+  </div>
+
+  <div id="view-play" class="screen" hidden>
+    <div class="infobar"><span id="roundLbl"></span><span id="timerPlay"></span></div>
+    <div class="caller">
+      <div class="ball empty" id="ball">Waiting</div>
+      <div style="flex:1">
+        <div style="font-size:13px;color:var(--muted);margin-bottom:4px" id="count">0 of 75 called</div>
+        <div class="recent" id="recent"></div>
       </div>
-      <div class="cardbox" id="cardArea"></div>
     </div>
-
-    <div class="status" id="status"></div>
-
-    <div class="row" id="controls" hidden>
-      <button class="btn" id="boardBtn">Board</button>
+    <div class="cardbox" id="cardArea"></div>
+    <div class="row">
       <button class="btn" id="autoBtn">Auto: Off</button>
-      <button class="btn bingo" id="bingoBtn" disabled>BINGO!</button>
+      <button class="btn bingo" id="bingoBtn" onclick="pressBingo()" disabled>BINGO!</button>
     </div>
   </div>
-</div>
 
-<div id="sheet" hidden>
-  <div class="sheetbox">
-    <h3 id="sheetTitle"></h3>
-    <div class="cardbox sm" id="sheetCard" style="align-self:center"></div>
-    <div class="row">
-      <button class="btn" id="sheetBack">Back</button>
-      <button class="btn primary" id="sheetPlay">Play this cartela</button>
+  <div id="view-history" class="screen" hidden>
+    <h2 style="font-size:18px;color:var(--ball);margin:0">Game History</h2>
+    <div class="stats-card">
+      <div class="stat-item"><div class="val" id="histTotal">0</div><div class="lbl">Total Games Played</div></div>
     </div>
+  </div>
+
+  <div id="view-wallet" class="screen" hidden>
+    <h2 style="font-size:18px;color:var(--ball);margin:0">Wallet & Balance</h2>
+    <div class="stats-card">
+      <div class="stat-item"><div class="val" id="walletBal">0.00 ETB</div><div class="lbl">Total Available Balance</div></div>
+    </div>
+  </div>
+
+  <div id="view-profile" class="screen" hidden>
+    <h2 style="font-size:18px;color:var(--ball);margin:0">Player Profile</h2>
+    <div class="stats-card">
+      <div class="stat-item"><div class="val" id="profName">Player</div><div class="lbl">Telegram User</div></div>
+    </div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <div class="bottom-nav">
+    <button class="nav-item active" onclick="switchTab('game')">
+      <svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm3-4c-.83 0-1.5-.67-1.5-1.5S17.67 8 18.5 8s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+      Game
+    </button>
+    <button class="nav-item" onclick="switchTab('history')">
+      <svg viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+      History
+    </button>
+    <button class="nav-item" onclick="switchTab('wallet')">
+      <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+      Wallet
+    </button>
+    <button class="nav-item" onclick="switchTab('profile')">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+      Profile
+    </button>
   </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import { getDatabase, ref, onValue, remove, push, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+import { getDatabase, ref, onValue, push, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
 
-/* ====== 1. FIREBASE SETTINGS CONFIGURED ====== */
 const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyBZtealdtm83Ve_7BZG2QBL_n9DY29hjy8",
-  authDomain: "bingo-83229.firebaseapp.com",
-  databaseURL: "https://bingo-83229-default-rtdb.firebaseio.com",
-  projectId: "bingo-83229",
-  storageBucket: "bingo-83229.firebasestorage.app",
-  messagingSenderId: "395054581766",
-  appId: "1:395054581766:web:ed97ee344841ff17e79b87"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  databaseURL: "https://bingo-83229-default-rtdb.firebaseio.com/",
+  projectId: "YOUR_PROJECT_ID",
+  appId: "YOUR_APP_ID"
 };
-/* ================================================== */
 
-const LOBBY_MS = 45000, CALL_MS = 4000, RESULT_MS = 12000, SLACK_MS = 1500, TOTAL_CARTELAS = 100;
+const app = initializeApp(FIREBASE_CONFIG);
+const db = getDatabase(app);
 
-// ==LOGIC START==
+const tg = window.Telegram && Telegram.WebApp;
+let me = "user_123", myName = "Player", currentStake = 10;
+let selectedCards = new Set();
+let cur = null, picks = {}, marks = {}, auto = false;
+
+if(tg){
+  tg.ready(); tg.expand();
+  if(tg.initDataUnsafe && tg.initDataUnsafe.user){
+    me = String(tg.initDataUnsafe.user.id);
+    myName = tg.initDataUnsafe.user.first_name || "Player";
+  }
+}
+document.getElementById('profName').textContent = myName;
+
+window.switchTab = function(tab){
+  document.querySelectorAll('.screen').forEach(s => s.hidden = true);
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-' + tab).hidden = false;
+  event.currentTarget.classList.add('active');
+}
+
+window.selectStake = function(stake){
+  currentStake = stake;
+  document.getElementById('view-game').hidden = true;
+  document.getElementById('view-lobby').hidden = false;
+  initLobby();
+}
+
 function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 function shuffled(arr,rng){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
-const cardCache={}, seqCache={};
+const cardCache={};
 function cardFor(k){
   if(cardCache[k]) return cardCache[k];
   const rng=mulberry32(k*7919+17);
@@ -179,307 +231,51 @@ function cardFor(k){
   card[2][2]=0;
   return cardCache[k]=card;
 }
-function seqFor(seed){
-  return seqCache[seed]||(seqCache[seed]=shuffled(Array.from({length:75},(_,i)=>i+1),mulberry32(seed)));
-}
-const LINES=(()=>{const L=[];for(let i=0;i<5;i++){L.push([0,1,2,3,4].map(k=>[i,k]));L.push([0,1,2,3,4].map(k=>[k,i]));}
-  L.push([0,1,2,3,4].map(k=>[k,k]));L.push([0,1,2,3,4].map(k=>[k,4-k]));return L;})();
-function lineWon(card,called,isMarked){
-  return LINES.find(l=>l.every(([r,c])=>{const n=card[r][c];const ok=n===0||called.has(n);return ok&&(!isMarked||isMarked(r,c));}))||null;
-}
-function letterFor(n){return 'BINGO'[Math.floor((n-1)/15)];}
-function mmss(ms){const s=Math.max(0,Math.ceil(ms/1000));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
-// ==LOGIC END==
 
-const $=id=>document.getElementById(id);
-const tg=window.Telegram&&Telegram.WebApp;
-let me, myName;
-try{ if(tg){ tg.ready(); tg.expand(); } }catch(e){}
-try{ tg&&tg.disableVerticalSwipes&&tg.disableVerticalSwipes(); }catch(e){}
-try{ tg&&tg.setHeaderColor('#2A1B3D'); tg&&tg.setBackgroundColor('#2A1B3D'); }catch(e){}
-(function(){
-  let u=null; try{ u=tg&&tg.initDataUnsafe&&tg.initDataUnsafe.user; }catch(e){}
-  if(u){ me=String(u.id); myName=u.username?'@'+u.username:(u.first_name||'Player'); }
-  else{
-    let g=null; try{g=localStorage.getItem('gid');}catch(e){}
-    if(!g){g='g'+Math.random().toString(36).slice(2,8);try{localStorage.setItem('gid',g);}catch(e){}}
-    me=g; myName='Guest '+g.slice(-3);
-  }
-})();
-const buzz=t=>{try{tg&&tg.HapticFeedback.notificationOccurred(t);}catch(e){}};
-const tap=()=>{try{tg&&tg.HapticFeedback.impactOccurred('light');}catch(e){}};
-
-let db, offset=0, cur=null, picks={}, claims={}, picksLoaded=false, unsubP=null, unsubC=null;
-let marks={}, auto=false, showBoard=false, changing=false, claimSent=false, chosen=null, selected=null, winNotified=false;
-let phase={name:'lobby',left:0}, lastSig='', flashMsg=null, advancing={id:0,at:0}, lastN=0;
-const now=()=>Date.now()+offset;
-const cm=()=>(cur&&cur.callMs)||CALL_MS;
-const pickCount=()=>Object.keys(picks).length;
-
-function myCartela(){
-  const mine=Object.keys(picks).filter(k=>picks[k]&&picks[k].uid===me).map(Number);
-  if(!mine.length) return null;
-  return mine.includes(chosen)?chosen:mine[0];
-}
-function ballsAt(t){ if(t<cur.lobbyEnd) return 0; return Math.min(75,Math.floor((t-cur.lobbyEnd)/cm())+1); }
-function calledSetOf(n){ return new Set(seqFor(cur.seed).slice(0,n)); }
-
-function validClaim(cl){
-  if(!cur||!cl||typeof cl.cartela!=='number'||typeof cl.t!=='number') return false;
-  const p=picks[cl.cartela]; if(!p||p.uid!==cl.uid) return false;
-  if(cl.t<cur.lobbyEnd||cl.t>now()+3000) return false;
-  return !!lineWon(cardFor(cl.cartela),calledSetOf(ballsAt(cl.t+SLACK_MS)));
-}
-function findWinner(){
-  const arr=Object.entries(claims).map(([k,v])=>Object.assign({k},v)).sort((a,b)=>(a.t-b.t)||(a.k<b.k?-1:1));
-  for(const c of arr) if(validClaim(c)) return c;
-  return null;
-}
-function computePhase(){
-  const t=now(), L=cur.lobbyEnd;
-  if(t<L) return {name:'lobby',left:L-t};
-  const w=findWinner();
-  if(w){
-    const endAt=w.t+RESULT_MS;
-    return t<endAt?{name:'over',win:w,left:endAt-t,n:ballsAt(w.t+SLACK_MS)}:{name:'finished'};
-  }
-  const lastEnd=L+75*cm()+4000;
-  if(t<lastEnd) return {name:'play',n:ballsAt(t),left:lastEnd-t};
-  if(t<lastEnd+RESULT_MS) return {name:'over',win:null,n:75,left:lastEnd+RESULT_MS-t};
-  return {name:'finished'};
-}
-
-/* ---------- database ---------- */
-function newRound(prevId){
-  return {id:prevId+1,seed:Math.floor(Math.random()*2147483647),lobbyEnd:Date.now()+offset+LOBBY_MS,callMs:CALL_MS};
-}
-function ensureRound(){
-  runTransaction(ref(db,'current'),c=>c===null?newRound(0):undefined).catch(()=>{});
-}
-function advance(){
-  if(!cur) return;
-  if(advancing.id===cur.id&&now()-advancing.at<4000) return;
-  advancing={id:cur.id,at:now()};
-  const oldId=cur.id;
-  runTransaction(ref(db,'current'),c=>{
-    if(c===null) return newRound(oldId);
-    if(c.id===oldId) return newRound(oldId);
-    return undefined;
-  }).then(()=>{ remove(ref(db,'rounds/'+(oldId-2))).catch(()=>{}); }).catch(()=>{});
-}
-function switchRound(v){
-  if(unsubP) unsubP(); if(unsubC) unsubC();
-  cur=v; picks={}; claims={}; picksLoaded=false;
-  marks={}; claimSent=false; chosen=null; selected=null; changing=false; winNotified=false; lastN=0; lastSig='';
-  closeSheet();
-  unsubP=onValue(ref(db,'rounds/'+v.id+'/picks'),s=>{picks=s.val()||{};picksLoaded=true;lastSig='';render();});
-  unsubC=onValue(ref(db,'rounds/'+v.id+'/claims'),s=>{claims=s.val()||{};});
-}
-async function chooseCartela(k){
-  if(!cur||phase.name!=='lobby'||phase.left<2500){ flash('Too late. Wait for the next round.','bad'); closeSheet(); return; }
-  const roundId=cur.id;
-  try{
-    const res=await runTransaction(ref(db,'rounds/'+roundId+'/picks/'+k),c=>c===null?{uid:me,name:myName}:undefined);
-    const val=res.snapshot.val();
-    if(!(res.committed||(val&&val.uid===me))){ flash('Cartela #'+k+' was just taken. Pick another.','bad'); buzz('error'); closeSheet(); return; }
-    chosen=k; changing=false;
-    for(const o of Object.keys(picks)){ if(Number(o)!==k&&picks[o]&&picks[o].uid===me) remove(ref(db,'rounds/'+roundId+'/picks/'+o)).catch(()=>{}); }
-    buzz('success'); closeSheet(); render();
-  }catch(e){ flash('Connection problem. Try again.','bad'); closeSheet(); }
-}
-function pressBingo(){
-  const mine=myCartela();
-  if(!cur||phase.name!=='play'||mine===null||claimSent) return;
-  const card=cardFor(mine), called=calledSetOf(phase.n);
-  const line=lineWon(card,called,isMarked(card,called));
-  if(!line){ flash('Not yet. Mark a full line of called numbers.','bad'); buzz('error'); return; }
-  claimSent=true;
-  push(ref(db,'rounds/'+cur.id+'/claims'),{uid:me,name:myName,cartela:mine,t:serverTimestamp()}).catch(()=>{claimSent=false;});
-  flash('Bingo sent. Checking…','good'); render();
-}
-
-/* ---------- rendering ---------- */
-function isMarked(card,called){
-  return (r,c)=>{const n=card[r][c];return n===0||!!marks[r*5+c]||(auto&&called.has(n));};
-}
-function buildCard(card,o){
-  const wrap=document.createElement('div'); wrap.className='card';
-  const head=document.createElement('div'); head.className='head';
-  for(const L of 'BINGO'){const d=document.createElement('div');d.textContent=L;head.appendChild(d);}
-  const grid=document.createElement('div'); grid.className='grid';
-  for(let r=0;r<5;r++) for(let c=0;c<5;c++){
-    const n=card[r][c];
-    const el=document.createElement(o.onTap&&n!==0?'button':'div');
-    el.className='cell';
-    if(n===0){el.classList.add('free');el.textContent='FREE';}
-    else{
-      el.textContent=n;
-      if(o.called&&o.called.has(n)) el.classList.add('called');
-      if(o.marked&&o.marked(r,c)) el.classList.add('marked');
-      if(o.onTap) el.addEventListener('click',()=>o.onTap(r,c));
-    }
-    if(o.win&&o.win.some(([wr,wc])=>wr===r&&wc===c)) el.classList.add('win');
-    grid.appendChild(el);
-  }
-  wrap.append(head,grid); return wrap;
-}
-function buildBoard(n){
-  const called=calledSetOf(n), last=n>0?seqFor(cur.seed)[n-1]:0;
-  const b=document.createElement('div'); b.className='board';
-  for(const L of 'BINGO'){const d=document.createElement('div');d.className='bh';d.textContent=L;b.appendChild(d);}
-  for(let i=0;i<15;i++) for(let c=0;c<5;c++){
-    const num=c*15+i+1, d=document.createElement('div');
-    d.className='bn'+(called.has(num)?' on':'')+(num===last?' last':'');
-    d.textContent=num; b.appendChild(d);
-  }
-  return b;
-}
-function show(id){
-  for(const x of ['wait','setup']) $(x).hidden=(x!==id);
-  $('main').hidden=(id!=='main');
-}
-function renderLobby(mine){
-  $('lobby').hidden=false; $('game').hidden=true; $('controls').hidden=true;
-  const box=$('lobbyBody'); box.innerHTML='';
-  if(mine!==null&&!changing){
-    const h=document.createElement('div'); h.className='hint'; h.textContent='You are in! The game starts when the timer ends.';
-    const cb=document.createElement('div'); cb.className='cardbox'; cb.style.margin='8px auto';
-    cb.appendChild(buildCard(cardFor(mine),{}));
-    const lab=document.createElement('div'); lab.className='cardlabel'; lab.textContent='Your cartela #'+mine;
-    const ch=document.createElement('button'); ch.className='btn'; ch.style.margin='10px auto 0'; ch.style.display='block'; ch.style.width='60%'; ch.textContent='Change cartela';
-    ch.onclick=()=>{changing=true;render();};
-    box.append(h,cb,lab,ch);
-  } else {
-    const h=document.createElement('div'); h.className='hint'; h.style.marginBottom='8px';
-    h.textContent='Pick a cartela (1–'+TOTAL_CARTELAS+'). Gray ones are taken.';
-    const g=document.createElement('div'); g.className='pgrid';
-    for(let k=1;k<=TOTAL_CARTELAS;k++){
-      const b=document.createElement('button'); b.className='pc'; b.textContent=k;
-      const p=picks[k];
-      if(p&&p.uid!==me){b.classList.add('taken');b.disabled=true;}
-      else{
-        if(p&&p.uid===me) b.classList.add('mine');
-        b.onclick=()=>openSheet(k);
+function initLobby(){
+  const grid = document.getElementById('lobbyGrid');
+  grid.innerHTML = '';
+  for(let i=1; i<=50; i++){
+    const btn = document.createElement('button');
+    btn.className = 'pc';
+    btn.textContent = i;
+    btn.onclick = () => {
+      if(selectedCards.has(i)){
+        selectedCards.delete(i);
+        btn.classList.remove('mine');
+      } else {
+        selectedCards.add(i);
+        btn.classList.add('mine');
       }
-      g.appendChild(b);
+    };
+    grid.appendChild(btn);
+  }
+}
+
+document.getElementById('confirmBuyBtn').onclick = () => {
+  if(selectedCards.size === 0){ alert("Please select at least one cartela."); return; }
+  // Switch to game play view and join room
+  document.getElementById('view-lobby').hidden = true;
+  document.getElementById('view-play').hidden = false;
+  startListeningGame();
+};
+
+function startListeningGame(){
+  onValue(ref(db, `rooms/${currentStake}/current`), snapshot => {
+    cur = snapshot.val();
+    if(cur){
+      document.getElementById('roundLbl').textContent = `Round ${cur.id} (${currentStake} ETB)`;
     }
-    box.append(h,g);
-    if(mine!==null){
-      const back=document.createElement('button'); back.className='btn'; back.style.margin='10px auto 0'; back.style.display='block'; back.style.width='60%'; back.textContent='Keep cartela #'+mine;
-      back.onclick=()=>{changing=false;render();}; box.appendChild(back);
-    }
-  }
-}
-function renderGame(mine){
-  $('lobby').hidden=true; $('game').hidden=false; $('controls').hidden=false;
-  const n=phase.n||0, seq=seqFor(cur.seed), ball=$('ball');
-  if(n===0){ball.className='ball empty';ball.innerHTML='Waiting';}
-  else{
-    const num=seq[n-1];
-    ball.className='ball'; ball.innerHTML='<small>'+letterFor(num)+'</small><b>'+num+'</b>';
-    if(n!==lastN){void ball.offsetWidth;ball.classList.add('pop');}
-  }
-  $('count').textContent=n+' of 75 called';
-  $('recent').innerHTML=seq.slice(Math.max(0,n-6),Math.max(0,n-1)).reverse().map(x=>'<span>'+x+'</span>').join('');
-  const area=$('cardArea'); area.innerHTML='';
-  const called=calledSetOf(n);
-  if(phase.name==='over'&&phase.win){
-    const w=phase.win, card=cardFor(w.cartela);
-    area.appendChild(buildCard(card,{called,marked:(r,c)=>{const v=card[r][c];return v===0||called.has(v);},win:lineWon(card,called)}));
-    const lab=document.createElement('div'); lab.className='cardlabel'; lab.textContent='Winning cartela #'+w.cartela; area.appendChild(lab);
-  } else if(mine===null||showBoard){
-    area.appendChild(buildBoard(n));
-  } else {
-    const card=cardFor(mine);
-    area.appendChild(buildCard(card,{
-      called, marked:isMarked(card,called),
-      onTap:(r,c)=>{ if(phase.name!=='play') return; marks[r*5+c]=!marks[r*5+c]; tap(); render(); }
-    }));
-  }
-  $('boardBtn').textContent=(showBoard&&mine!==null)?'My card':'Board';
-  $('boardBtn').disabled=(mine===null);
-  $('autoBtn').textContent='Auto: '+(auto?'On':'Off');
-  $('bingoBtn').disabled=!(mine!==null&&phase.name==='play'&&!claimSent);
-}
-function render(){
-  if(!cur){show('wait');return;}
-  show('main');
-  phase=computePhase();
-  const mine=myCartela(), inLobby=phase.name==='lobby';
-  $('greet').textContent=mine!==null?('Good luck, '+myName+'!'):inLobby?('Welcome, '+myName+'! Pick your cartela.'):('Hi '+myName+', you can join the next round.');
-  const pc=pickCount();
-  $('roundLbl').textContent='Round '+cur.id+' · '+pc+' player'+(pc===1?'':'s');
-  if(inLobby) renderLobby(mine); else renderGame(mine);
-  updateTimer(); updateStatus();
-}
-function updateTimer(){
-  if(!cur) return;
-  const p=phase; let t='';
-  if(p.name==='lobby') t='Starts in '+mmss(p.left);
-  else if(p.name==='play') t='Ball '+p.n+' of 75';
-  else if(p.name==='over') t='Next round in '+mmss(p.left);
-  else t='…';
-  $('timer').textContent=t;
-}
-function flash(text,cls){ flashMsg={text,cls,until:Date.now()+3000}; updateStatus(); }
-function updateStatus(){
-  const s=$('status'); let text='',cls='';
-  if(flashMsg&&Date.now()<flashMsg.until){text=flashMsg.text;cls=flashMsg.cls||'';}
-  else if(cur){
-    const mine=myCartela();
-    if(phase.name==='over'){
-      if(phase.win){
-        if(phase.win.uid===me){text='You won! Congratulations!';cls='good';}
-        else text=phase.win.name+' won with cartela #'+phase.win.cartela;
-      } else text='No winner this round.';
-    } else if(phase.name==='play'){
-      text=mine!==null?'Mark called numbers. Complete a line, then press BINGO!':'Round in progress. Join the next round.';
-    }
-  }
-  s.textContent=text; s.className='status '+cls;
-}
-
-/* ---------- sheet ---------- */
-function openSheet(k){
-  selected=k; $('sheetTitle').textContent='Cartela #'+k;
-  const box=$('sheetCard'); box.innerHTML=''; box.appendChild(buildCard(cardFor(k),{}));
-  $('sheet').hidden=false;
-}
-function closeSheet(){ $('sheet').hidden=true; selected=null; }
-
-/* ---------- tick ---------- */
-function tick(){
-  if(!cur) return;
-  phase=computePhase();
-  if(phase.name==='finished'||(phase.name!=='lobby'&&picksLoaded&&pickCount()===0)) advance();
-  if(phase.name==='over'&&phase.win&&phase.win.uid===me&&!winNotified){winNotified=true;buzz('success');}
-  const sig=cur.id+'|'+phase.name+'|'+(phase.n||0)+'|'+(phase.win?phase.win.k:'');
-  if(sig!==lastSig){
-    if(phase.name==='play'&&(phase.n||0)>lastN) tap();
-    if(phase.name==='over') flashMsg=null;
-    lastSig=sig; render(); lastN=phase.n||0;
-  }
-  updateTimer(); updateStatus();
-}
-
-/* ---------- start ---------- */
-$('boardBtn').onclick=()=>{showBoard=!showBoard;render();};
-$('autoBtn').onclick=()=>{auto=!auto;render();};
-$('bingoBtn').onclick=pressBingo;
-$('sheetBack').onclick=closeSheet;
-$('sheetPlay').onclick=()=>{ if(selected!==null) chooseCartela(selected); };
-
-{
-  show('wait');
-  db=getDatabase(initializeApp(FIREBASE_CONFIG));
-  onValue(ref(db,'.info/serverTimeOffset'),s=>{offset=s.val()||0;});
-  onValue(ref(db,'current'),s=>{
-    const v=s.val();
-    if(!v){ensureRound();return;}
-    if(!cur||cur.id!==v.id) switchRound(v); else cur=v;
-    render();
   });
-  setInterval(tick,250);
+}
+
+// Speech Synthesis for calling out balls loud (e.g., "B 10")
+function speakBall(letter, number){
+  if('speechSynthesis' in window){
+    const utterance = new SpeechSynthesisUtterance(`${letter} ${number}`);
+    utterance.rate = 1.0;
+    window.speechSynthesis.speak(utterance);
+  }
 }
 </script>
 </body>
