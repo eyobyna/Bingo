@@ -44,7 +44,7 @@ body{display:flex;justify-content:center}
 .welcome-title{font-size:21px;font-weight:800;line-height:1.3}
 .welcome-title span{color:var(--ball)}
 .welcome-motto{font-size:13px;color:var(--muted);font-weight:700}
-.welcome-amharic-title{font-size:18px;font-weight:800;color:var(--paper);margin-top:6px}
+.welcome-amharic-title{font-size:17px;font-weight:800;color:var(--paper);margin-top:6px}
 .welcome-amharic-motto{font-size:13px;color:var(--ball);font-weight:700}
 
 .stake-card{background:var(--panel-bg);border:1px solid var(--panel-border);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:14px;backdrop-filter:blur(10px);box-shadow:0 8px 32px rgba(0,0,0,0.3)}
@@ -195,7 +195,7 @@ button.btn:disabled{opacity:.45}
       </div>
       <div id="waitView" class="welcome-box" style="margin:auto;color:var(--muted)">Connecting…</div>
       
-      <div id="activeGameWrapper" hidden style="display:flex;flex-direction:column;gap:14px;flex:1">
+      <div id="activeGameWrapper" class="welcome-box" style="display:flex;flex-direction:column;gap:14px;flex:1">
         <div class="welcome-box" style="margin:0">
           <div class="welcome-title">Welcome to <span>Meznagna Bingo</span></div>
           <div class="welcome-motto">Win while having fun!</div>
@@ -715,11 +715,12 @@ function render(){
   const pc=pickCount();
   $('roundLbl').textContent='Round '+cur.id+' · '+pc+' player'+(pc===1?'':'s');
   
-  // Explicitly manage lobby vs active game view visibility
-  if(inLobby) {
-    renderLobby(mine);
-  } else {
-    renderGame(mine);
+  if(inActiveGameSession) {
+    if(inLobby) {
+      renderLobby(mine);
+    } else {
+      renderGame(mine);
+    }
   }
   
   updateTimer(); updateStatus();
@@ -747,7 +748,6 @@ function updateStatus(){
         if(phase.win.uid===me){
           text=`You won ${prizePool} ETB! Congratulations!`;
           cls='good';
-          // Payout 80% to winner's deposit balance once per win
           if(!winNotified){
             winNotified=true;
             runTransaction(ref(db,'users/'+me), u => {
