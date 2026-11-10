@@ -36,8 +36,8 @@ body{display:flex;justify-content:center}
 .rules-btn{background:var(--panel-bg);border:1px solid var(--panel-border);color:var(--paper);padding:6px 12px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;flex:none}
 
 /* Content Area */
-.content{flex:1;overflow-y:auto;padding:14px 16px 80px;display:flex;flex-direction:column;gap:16px}
-.view{display:flex;flex-direction:column;gap:16px;flex:1}
+.content{flex:1;overflow-y:auto;padding:14px 16px 80px;display:flex;flex-direction:column;gap:12px}
+.view{display:flex;flex-direction:column;gap:12px;flex:1}
 
 /* Home / Game View */
 .welcome-box{text-align:center;margin:6px 0 2px;display:flex;flex-direction:column;gap:4px}
@@ -106,54 +106,56 @@ body{display:flex;justify-content:center}
 .gstat-val{font-family:'Bowlby One',sans-serif;font-size:13px;color:var(--ball)}
 
 /* In-game Active Screen */
-.greet{text-align:center;font-weight:800;font-size:15px;min-height:20px}
+.greet{text-align:center;font-weight:800;font-size:14px;min-height:18px}
 
 /* caller */
-.caller{display:flex;align-items:center;gap:14px;flex:none}
-.ball{width:68px;height:68px;flex:none;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFE79A 0,var(--ball) 55%,#E0A41A 100%);color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Bowlby One',sans-serif;line-height:1;box-shadow:0 4px 0 #9A6B00}
-.ball small{font-size:14px}
-.ball b{font-size:26px;font-weight:400}
+.caller{display:flex;align-items:center;gap:12px;flex:none}
+.ball{width:58px;height:58px;flex:none;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFE79A 0,var(--ball) 55%,#E0A41A 100%);color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Bowlby One',sans-serif;line-height:1;box-shadow:0 4px 0 #9A6B00}
+.ball small{font-size:12px}
+.ball b{font-size:22px;font-weight:400}
 .ball.empty{background:#150a24;box-shadow:none;border:3px dashed var(--muted);color:var(--muted);font-size:11px;font-family:'Nunito',sans-serif;font-weight:800;text-align:center}
 .ball.pop{animation:pop .35s ease-out}
 @keyframes pop{0%{transform:scale(.6)}70%{transform:scale(1.08)}100%{transform:scale(1)}}
 .callinfo{flex:1;min-width:0}
-.callinfo .count{font-size:13px;color:var(--muted);margin-bottom:4px}
-.recent{display:flex;gap:5px;flex-wrap:nowrap;min-height:28px}
-.recent span{background:#150a24;border:2px solid var(--ball);color:var(--ball);border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800}
+.callinfo .count{font-size:12px;color:var(--muted);margin-bottom:3px}
+.recent{display:flex;gap:4px;flex-wrap:nowrap;min-height:24px}
+.recent span{background:#150a24;border:2px solid var(--ball);color:var(--ball);border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800}
 
 /* Centered & Responsive Card / Cartela Layout */
-.cardbox{width:100%;max-width:360px;margin:0 auto;flex:none}
+.cardbox{width:100%;max-width:340px;margin:0 auto;flex:none}
 .cardbox.sm{width:min(100%,300px)}
 .card{background:var(--paper);color:var(--ink);border-radius:14px;padding:8px;box-shadow:0 5px 0 #150a24;container-type:inline-size;width:100%}
-.head,.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
-.head{margin-bottom:4px}
-.head div{font-family:'Bowlby One',sans-serif;font-size:clamp(18px,8cqw,28px);text-align:center;color:var(--dauber);line-height:1.1}
-.cell{position:relative;aspect-ratio:1;border:0;border-radius:10px;background:#fff;color:var(--ink);font-family:inherit;font-weight:800;font-size:clamp(14px,7.5cqw,26px);box-shadow:inset 0 0 0 2px #CFE0D3;display:flex;align-items:center;justify-content:center;padding:0}
+.head,.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.head{margin-bottom:3px}
+.head div{font-family:'Bowlby One',sans-serif;font-size:clamp(16px,7cqw,24px);text-align:center;color:var(--dauber);line-height:1.1}
+.cell{position:relative;aspect-ratio:1;border:0;border-radius:8px;background:#fff;color:var(--ink);font-family:inherit;font-weight:800;font-size:clamp(13px,7cqw,24px);box-shadow:inset 0 0 0 2px #CFE0D3;display:flex;align-items:center;justify-content:center;padding:0}
 button.cell{cursor:pointer;transition:transform .08s}
 button.cell:active{transform:scale(.94)}
 .cell.called:not(.marked){box-shadow:inset 0 0 0 3px var(--ball)}
 .cell.marked{background:var(--dauber);color:#fff;box-shadow:none}
 .cell.marked::after{content:"";position:absolute;inset:18%;border-radius:50%;border:3px solid rgba(255,255,255,.55)}
-.cell.free{font-size:clamp(10px,4cqw,13px);background:var(--ball);box-shadow:none}
+.cell.free{font-size:clamp(9px,3.5cqw,12px);background:var(--ball);box-shadow:none}
 .cell.win{background:var(--win);color:#fff}
-.cardlabel{text-align:center;color:var(--muted);font-size:13px;margin-top:8px}
+.cardlabel{text-align:center;color:var(--muted);font-size:12px;margin-top:6px}
 
 /* board */
-.board{background:var(--paper);border-radius:14px;padding:8px;box-shadow:0 5px 0 #150a24;display:grid;grid-template-columns:repeat(5,1fr);gap:3px;container-type:inline-size;width:100%;max-width:360px;margin:0 auto}
-.board .bh{font-family:'Bowlby One',sans-serif;text-align:center;color:var(--dauber);font-size:18px}
-.board .bn{text-align:center;border-radius:6px;background:#fff;color:#9AA8A0;font-size:clamp(11px,4.5cqw,15px);font-weight:800;padding:6px 0}
+.board{background:var(--paper);border-radius:14px;padding:8px;box-shadow:0 5px 0 #150a24;display:grid;grid-template-columns:repeat(5,1fr);gap:3px;container-type:inline-size;width:100%;max-width:340px;margin:0 auto}
+.board .bh{font-family:'Bowlby One',sans-serif;text-align:center;color:var(--dauber);font-size:16px}
+.board .bn{text-align:center;border-radius:6px;background:#fff;color:#9AA8A0;font-size:clamp(10px,4cqw,14px);font-weight:800;padding:4px 0}
 .board .bn.on{background:var(--ball);color:var(--ink)}
 .board .bn.last{background:var(--dauber);color:#fff}
 
-/* lobby grid */
-.hint{color:var(--muted);font-size:13px;text-align:center}
-.pgrid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;padding:2px}
-.pc{border:0;border-radius:10px;height:38px;background:var(--panel-bg);color:var(--paper);font:inherit;font-weight:800;font-size:14px;cursor:pointer;border:1px solid var(--panel-border)}
+/* lobby grid container with scrolling */
+.screen{display:flex;flex-direction:column;flex:1;min-height:0}
+#lobby{overflow-y:auto;max-height:calc(100dvh - 230px);padding-bottom:10px}
+.hint{color:var(--muted);font-size:13px;text-align:center;margin-bottom:8px;flex:none}
+.pgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;padding:2px}
+.pc{border:0;border-radius:10px;height:42px;background:var(--panel-bg);color:var(--paper);font:inherit;font-weight:800;font-size:14px;cursor:pointer;border:1px solid var(--panel-border)}
 .pc.taken{opacity:.28;cursor:not-allowed}
 .pc.mine{background:var(--dauber);color:#fff;border:0}
 
 /* status and controls */
-.status{min-height:20px;text-align:center;font-weight:800;font-size:14px;flex:none}
+.status{min-height:20px;text-align:center;font-weight:800;font-size:13px;flex:none}
 .status.bad{color:#FF8FA3}
 .status.good{color:var(--ball)}
 .row{display:flex;gap:8px;flex:none}
@@ -712,7 +714,14 @@ function render(){
   $('greet').textContent=mine!==null?(`Good luck, ${myName}! Pool: ${totalPool} ETB (Win: ${prizePool} ETB)`):inLobby?(`Welcome, ${myName}! Pool: ${totalPool} ETB`):(`Hi ${myName}, join the next round.`);
   const pc=pickCount();
   $('roundLbl').textContent='Round '+cur.id+' · '+pc+' player'+(pc===1?'':'s');
-  if(inLobby) renderLobby(mine); else renderGame(mine);
+  
+  // Explicitly manage lobby vs active game view visibility
+  if(inLobby) {
+    renderLobby(mine);
+  } else {
+    renderGame(mine);
+  }
+  
   updateTimer(); updateStatus();
 }
 
