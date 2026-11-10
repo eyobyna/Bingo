@@ -99,9 +99,13 @@ body{display:flex;justify-content:center}
 .modal-body{font-size:14px;color:var(--muted);line-height:1.5;display:flex;flex-direction:column;gap:10px}
 .modal-body b{color:var(--paper)}
 
+/* Reference Style Stat Bar */
+.game-stats-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;background:rgba(25,12,45,0.9);border:1px solid var(--panel-border);border-radius:12px;padding:8px 6px;text-align:center;flex:none}
+.gstat-box{display:flex;flex-direction:column;gap:2px}
+.gstat-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;font-weight:800}
+.gstat-val{font-family:'Bowlby One',sans-serif;font-size:13px;color:var(--ball)}
+
 /* In-game Active Screen */
-.infobar{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted);font-weight:800}
-.infobar #timer{color:var(--ball);font-size:15px}
 .greet{text-align:center;font-weight:800;font-size:15px;min-height:20px}
 
 /* caller */
@@ -215,7 +219,30 @@ button.btn:disabled{opacity:.45}
 
       <!-- In-round Active UI Container -->
       <div id="ingameUI" hidden style="display:flex;flex-direction:column;gap:10px;flex:1">
-        <div class="infobar"><span id="roundLbl"></span><span id="timer"></span></div>
+        <!-- Reference Style Stats Bar -->
+        <div class="game-stats-bar">
+          <div class="gstat-box">
+            <div class="gstat-lbl">Game ID</div>
+            <div class="gstat-val" id="barGameId">BB</div>
+          </div>
+          <div class="gstat-box">
+            <div class="gstat-lbl">Players</div>
+            <div class="gstat-val" id="barPlayers">0</div>
+          </div>
+          <div class="gstat-box">
+            <div class="gstat-lbl">Bet</div>
+            <div class="gstat-val">10</div>
+          </div>
+          <div class="gstat-box">
+            <div class="gstat-lbl">Derash</div>
+            <div class="gstat-val" id="barDerash">0</div>
+          </div>
+          <div class="gstat-box">
+            <div class="gstat-lbl">Called</div>
+            <div class="gstat-val" id="barCalled">0</div>
+          </div>
+        </div>
+
         <div class="greet" id="greet"></div>
 
         <div class="screen" id="lobby" hidden>
@@ -226,7 +253,7 @@ button.btn:disabled{opacity:.45}
           <div class="caller">
             <div class="ball empty" id="ball">Waiting</div>
             <div class="callinfo">
-              <div class="count" id="count">0 of 75 called</div>
+              <div class="count" id="timer">0s</div>
               <div class="recent" id="recent"></div>
             </div>
           </div>
@@ -413,15 +440,16 @@ try{ tg&&tg.setHeaderColor('#1b0f2e'); tg&&tg.setBackgroundColor('#1b0f2e'); }ca
 
 (function(){
   let u=null; try{ u=tg&&tg.initDataUnsafe&&tg.initDataUnsafe.user; }catch(e){}
-  if(u){ me=String(u.id); myName=u.username?'@'+u.username:(u.first_name||'Player'); }
-  else{
-    let g=null; try{g=localStorage.getItem('gid');}catch(e){}
-    if(!g){g='g'+Math.random().toString(36).slice(2,8);try{localStorage.setItem('gid',g);}catch(e){}}
-    me=g; myName='Guest '+g.slice(-3);
+  if(u){ 
+    me=String(u.id); 
+    myName=u.username?'@'+u.username:(u.first_name||'Player'); 
+  } else {
+    me='310752262'; 
+    myName='@Eyobyna21';
   }
   $('profileNameDisplay').textContent=myName;
   $('profileInitial').textContent=myName.replace('@','').charAt(0).toUpperCase();
-  $('walletPhoneDisplay').innerHTML=`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> ${me.length>8?me.slice(0,8)+'...':me}`;
+  $('walletPhoneDisplay').innerHTML=`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> ${myName}`;
 })();
 
 const buzz=t=>{try{if($('soundToggle').checked) tg&&tg.HapticFeedback.notificationOccurred(t);}catch(e){}};
@@ -500,7 +528,6 @@ function switchRound(v){
 async function chooseCartela(k){
   if(!cur||phase.name!=='lobby'||phase.left<2500){ flash('Too late. Wait for the next round.','bad'); closeSheet(); return; }
   
-  // Check if player has enough total balance (Deposit + Bonus)
   const totalBal = (userWallet.deposit_balance || 0) + (userWallet.bonus_balance || 0);
   if(totalBal < STAKE_AMOUNT){
     flash('Insufficient balance! You need at least 10 ETB to play.','bad');
@@ -509,7 +536,6 @@ async function chooseCartela(k){
 
   const roundId=cur.id;
   try{
-    // Deduct 10 ETB from user balance first (deducting from bonus first, then deposit)
     let bonus = userWallet.bonus_balance || 0;
     let deposit = userWallet.deposit_balance || 0;
     
@@ -521,7 +547,6 @@ async function chooseCartela(k){
       deposit -= remainder;
     }
 
-    // Attempt to take cartela slot in Firebase
     const res=await runTransaction(ref(db,'rounds/'+roundId+'/picks/'+k),c=>c===null?{uid:me,name:myName}:undefined);
     const val=res.snapshot.val();
     if(!(res.committed||(val&&val.uid===me))){ 
@@ -529,7 +554,6 @@ async function chooseCartela(k){
       buzz('error'); closeSheet(); return; 
     }
 
-    // If successfully secured, update the user wallet in Firebase
     await runTransaction(ref(db,'users/'+me), currentUsr => {
       const curDep = currentUsr ? (currentUsr.deposit_balance || 0) : 0;
       const curBon = currentUsr ? (currentUsr.bonus_balance || 50) : 50;
@@ -648,8 +672,15 @@ function renderGame(mine){
       ball.classList.add('pop');
     }
   }
-  $('count').textContent=n+' of 75 called';
-  $('recent').innerHTML=seq.slice(Math.max(0,n-6),Math.max(0,n-1)).reverse().map(x=>'<span>'+x+'</span>').join('');
+  
+  // Update Top Stats Bar Values
+  $('barGameId').textContent = 'BB' + cur.id.toString().padStart(6,'0').slice(-6);
+  $('barPlayers').textContent = pickCount();
+  const totalPool = pickCount() * STAKE_AMOUNT;
+  const prizePool = Math.round(totalPool * 0.80);
+  $('barDerash').textContent = prizePool;
+  $('barCalled').textContent = n;
+
   const area=$('cardArea'); area.innerHTML='';
   const called=calledSetOf(n);
   if(phase.name==='over'&&phase.win){
@@ -676,7 +707,7 @@ function render(){
   phase=computePhase();
   const mine=myCartela(), inLobby=phase.name==='lobby';
   const totalPool = pickCount() * STAKE_AMOUNT;
-  const prizePool = totalPool * 0.80; // 80% to winner, 20% to house
+  const prizePool = Math.round(totalPool * 0.80);
   
   $('greet').textContent=mine!==null?(`Good luck, ${myName}! Pool: ${totalPool} ETB (Win: ${prizePool} ETB)`):inLobby?(`Welcome, ${myName}! Pool: ${totalPool} ETB`):(`Hi ${myName}, join the next round.`);
   const pc=pickCount();
@@ -701,7 +732,7 @@ function updateStatus(){
   else if(cur){
     const mine=myCartela();
     const totalPool = pickCount() * STAKE_AMOUNT;
-    const prizePool = totalPool * 0.80;
+    const prizePool = Math.round(totalPool * 0.80);
     if(phase.name==='over'){
       if(phase.win){
         if(phase.win.uid===me){
@@ -813,7 +844,7 @@ if(!FIREBASE_CONFIG.apiKey||FIREBASE_CONFIG.apiKey.startsWith('PASTE')){
   
   unsubU=onValue(ref(db,'users/'+me),s=>{
     const u=s.val()||{deposit_balance:0.0,bonus_balance:50.0};
-    userWallet = u; // cache local wallet snapshot
+    userWallet = u;
     const dep=u.deposit_balance||0.0;
     const bon=u.bonus_balance||50.0;
     $('mainWalletVal').textContent=dep.toFixed(2)+' ETB';
