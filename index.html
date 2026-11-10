@@ -153,13 +153,13 @@ button.btn:disabled{opacity:.45}
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import { getDatabase, ref, onValue, remove, push, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
 
-/* ====== FIREBASE CONFIG CONFIGURED ====== */
+/* ====== 1. PASTE YOUR FIREBASE SETTINGS HERE ====== */
 const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyBZtealdtm83Ve_7BZG2QBL_n9DY29hjy8",
-  authDomain: "bingo-83229.firebaseapp.com",
-  databaseURL: "https://bingo-83229-default-rtdb.firebaseio.com/",
-  projectId: "bingo-83229",
-  appId: "1:395054581766:web:ed97ee344841ff17e79b87"
+  apiKey: "PASTE_API_KEY",
+  authDomain: "PASTE",
+  databaseURL: "PASTE_DATABASE_URL",
+  projectId: "PASTE",
+  appId: "PASTE"
 };
 /* ================================================== */
 
@@ -333,7 +333,8 @@ function buildBoard(n){
   return b;
 }
 function show(id){
-  for(const x of ['wait','setup']) $(x).hidden=(x!==id);$('main').hidden=(id!=='main');
+  for(const x of ['wait','setup']) $(x).hidden=(x!==id);
+  $('main').hidden=(id!=='main');
 }
 function renderLobby(mine){
   $('lobby').hidden=false; $('game').hidden=true; $('controls').hidden=true;
@@ -376,4 +377,109 @@ function renderGame(mine){
     ball.className='ball'; ball.innerHTML='<small>'+letterFor(num)+'</small><b>'+num+'</b>';
     if(n!==lastN){void ball.offsetWidth;ball.classList.add('pop');}
   }
-  $('count').textContent=n+' of 75 called';$('recent').innerHTML=seq.slice(Math.max(0,n-6),Math.max(0,n-1)).reverse().map(x=>'<span>'+x
+  $('count').textContent=n+' of 75 called';
+  $('recent').innerHTML=seq.slice(Math.max(0,n-6),Math.max(0,n-1)).reverse().map(x=>'<span>'+x+'</span>').join('');
+  const area=$('cardArea'); area.innerHTML='';
+  const called=calledSetOf(n);
+  if(phase.name==='over'&&phase.win){
+    const w=phase.win, card=cardFor(w.cartela);
+    area.appendChild(buildCard(card,{called,marked:(r,c)=>{const v=card[r][c];return v===0||called.has(v);},win:lineWon(card,called)}));
+    const lab=document.createElement('div'); lab.className='cardlabel'; lab.textContent='Winning cartela #'+w.cartela; area.appendChild(lab);
+  } else if(mine===null||showBoard){
+    area.appendChild(buildBoard(n));
+  } else {
+    const card=cardFor(mine);
+    area.appendChild(buildCard(card,{
+      called, marked:isMarked(card,called),
+      onTap:(r,c)=>{ if(phase.name!=='play') return; marks[r*5+c]=!marks[r*5+c]; tap(); render(); }
+    }));
+  }
+  $('boardBtn').textContent=(showBoard&&mine!==null)?'My card':'Board';
+  $('boardBtn').disabled=(mine===null);
+  $('autoBtn').textContent='Auto: '+(auto?'On':'Off');
+  $('bingoBtn').disabled=!(mine!==null&&phase.name==='play'&&!claimSent);
+}
+function render(){
+  if(!cur){show('wait');return;}
+  show('main');
+  phase=computePhase();
+  const mine=myCartela(), inLobby=phase.name==='lobby';
+  $('greet').textContent=mine!==null?('Good luck, '+myName+'!'):inLobby?('Welcome, '+myName+'! Pick your cartela.'):('Hi '+myName+', you can join the next round.');
+  const pc=pickCount();
+  $('roundLbl').textContent='Round '+cur.id+' · '+pc+' player'+(pc===1?'':'s');
+  if(inLobby) renderLobby(mine); else renderGame(mine);
+  updateTimer(); updateStatus();
+}
+function updateTimer(){
+  if(!cur) return;
+  const p=phase; let t='';
+  if(p.name==='lobby') t='Starts in '+mmss(p.left);
+  else if(p.name==='play') t='Ball '+p.n+' of 75';
+  else if(p.name==='over') t='Next round in '+mmss(p.left);
+  else t='…';
+  $('timer').textContent=t;
+}
+function flash(text,cls){ flashMsg={text,cls,until:Date.now()+3000}; updateStatus(); }
+function updateStatus(){
+  const s=$('status'); let text='',cls='';
+  if(flashMsg&&Date.now()<flashMsg.until){text=flashMsg.text;cls=flashMsg.cls||'';}
+  else if(cur){
+    const mine=myCartela();
+    if(phase.name==='over'){
+      if(phase.win){
+        if(phase.win.uid===me){text='You won! Congratulations!';cls='good';}
+        else text=phase.win.name+' won with cartela #'+phase.win.cartela;
+      } else text='No winner this round.';
+    } else if(phase.name==='play'){
+      text=mine!==null?'Mark called numbers. Complete a line, then press BINGO!':'Round in progress. Join the next round.';
+    }
+  }
+  s.textContent=text; s.className='status '+cls;
+}
+
+/* ---------- sheet ---------- */
+function openSheet(k){
+  selected=k; $('sheetTitle').textContent='Cartela #'+k;
+  const box=$('sheetCard'); box.innerHTML=''; box.appendChild(buildCard(cardFor(k),{}));
+  $('sheet').hidden=false;
+}
+function closeSheet(){ $('sheet').hidden=true; selected=null; }
+
+/* ---------- tick ---------- */
+function tick(){
+  if(!cur) return;
+  phase=computePhase();
+  if(phase.name==='finished'||(phase.name!=='lobby'&&picksLoaded&&pickCount()===0)) advance();
+  if(phase.name==='over'&&phase.win&&phase.win.uid===me&&!winNotified){winNotified=true;buzz('success');}
+  const sig=cur.id+'|'+phase.name+'|'+(phase.n||0)+'|'+(phase.win?phase.win.k:'');
+  if(sig!==lastSig){
+    if(phase.name==='play'&&(phase.n||0)>lastN) tap();
+    if(phase.name==='over') flashMsg=null;
+    lastSig=sig; render(); lastN=phase.n||0;
+  }
+  updateTimer(); updateStatus();
+}
+
+/* ---------- start ---------- */
+$('boardBtn').onclick=()=>{showBoard=!showBoard;render();};
+$('autoBtn').onclick=()=>{auto=!auto;render();};
+$('bingoBtn').onclick=pressBingo;
+$('sheetBack').onclick=closeSheet;
+$('sheetPlay').onclick=()=>{ if(selected!==null) chooseCartela(selected); };
+
+if(!FIREBASE_CONFIG.apiKey||FIREBASE_CONFIG.apiKey.startsWith('PASTE')){ show('setup'); }
+else{
+  show('wait');
+  db=getDatabase(initializeApp(FIREBASE_CONFIG));
+  onValue(ref(db,'.info/serverTimeOffset'),s=>{offset=s.val()||0;});
+  onValue(ref(db,'current'),s=>{
+    const v=s.val();
+    if(!v){ensureRound();return;}
+    if(!cur||cur.id!==v.id) switchRound(v); else cur=v;
+    render();
+  });
+  setInterval(tick,250);
+}
+</script>
+</body>
+</html>
