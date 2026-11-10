@@ -8,46 +8,116 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --hall:#2A1B3D; --hall-deep:#1D1230; --paper:#EAF4EC; --ink:#1B1B2F;
-  --dauber:#E6007E; --ball:#FFC93C; --muted:#B9A9D1; --win:#14A76C;
+  --bg-gradient: linear-gradient(135deg, #1b0f2e 0%, #2a164a 50%, #150a24 100%);
+  --panel-bg: rgba(30, 18, 52, 0.75);
+  --panel-border: rgba(140, 90, 200, 0.2);
+  --paper:#EAF4EC; --ink:#1B1B2F;
+  --dauber:#E6007E; --ball:#FFC93C; --muted:#9E8CB9; --win:#14A76C;
+  --btn-green: linear-gradient(135deg, #00b09b, #96c93d);
+  --btn-blue: linear-gradient(135deg, #3a7bd5, #3a6073);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%;background:var(--hall-deep);color:var(--paper);font-family:'Nunito',system-ui,sans-serif;font-weight:600}
+html,body{margin:0;height:100%;background:#1b0f2e;background-image:var(--bg-gradient);color:var(--paper);font-family:'Nunito',system-ui,sans-serif;font-weight:600;overflow:hidden}
 body{display:flex;justify-content:center}
 [hidden]{display:none!important}
-#app{width:100%;max-width:480px;height:100dvh;padding:8px 12px 12px;display:flex;flex-direction:column;gap:8px;background:var(--hall)}
 
-.brand{text-align:center;line-height:1.2}
-.brand-am{font-size:26px;font-weight:800;color:var(--ball)}
-.brand-motto{font-size:14px;color:var(--paper);margin-top:1px}
-.brand-motto-en{font-size:12px;color:var(--muted);margin-top:1px}
+#app{width:100%;max-width:480px;height:100dvh;display:flex;flex-direction:column;position:relative;overflow:hidden}
 
+/* Top bar */
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;flex:none}
+.logo-area{display:flex;align-items:center;gap:10px}
+.logo-badge{width:36px;height:36px;border-radius:50%;background:var(--dauber);display:flex;align-items:center;justify-content:center;font-family:'Bowlby One',sans-serif;font-size:18px;color:#fff;box-shadow:0 2px 8px rgba(230,0,126,0.4)}
+.logo-title{font-family:'Bowlby One',sans-serif;font-size:18px;letter-spacing:0.5px}
+.rules-btn{background:var(--panel-bg);border:1px solid var(--panel-border);color:var(--paper);padding:6px 12px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px}
+
+/* Main Content Area */
+.content{flex:1;overflow-y:auto;padding:10px 16px 80px;display:flex;flex-direction:column;gap:16px}
+
+/* Nav Tabs Views */
+.view{display:flex;flex-direction:column;gap:16px;flex:1}
+
+/* Home / Game View */
+.welcome-box{text-align:center;margin:10px 0 5px}
+.welcome-title{font-size:24px;font-weight:800;line-height:1.3}
+.welcome-title span{color:var(--ball)}
+
+.stake-card{background:var(--panel-bg);border:1px solid var(--panel-border);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:14px;backdrop-filter:blur(10px);box-shadow:0 8px 32px rgba(0,0,0,0.3)}
+.stake-title{text-align:center;font-size:14px;color:var(--ball);font-weight:800;letter-spacing:1px;text-transform:uppercase}
+.stake-btn{border:0;border-radius:14px;padding:16px;font:inherit;font-weight:800;font-size:16px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 15px rgba(0,0,0,0.2);transition:transform 0.1s}
+.stake-btn:active{transform:scale(0.97)}
+.stake-btn.p10{background:var(--btn-green)}
+
+.stats-card{background:var(--panel-bg);border:1px solid var(--panel-border);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:18px;text-align:center;backdrop-filter:blur(10px)}
+.stat-item .num{font-family:'Bowlby One',sans-serif;font-size:28px;color:var(--ball)}
+.stat-item .lbl{font-size:13px;color:var(--muted);margin-top:2px}
+
+/* Bottom Navigation Bar */
+.navbar{position:absolute;bottom:0;left:0;right:0;height:65px;background:rgba(20, 10, 35, 0.95);border-top:1px solid var(--panel-border);display:flex;justify-content:around;align-items:center;padding:0 10px;backdrop-filter:blur(15px);z-index:10}
+.nav-item{flex:1;background:none;border:0;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font:inherit;font-size:11px;font-weight:700;cursor:pointer;padding:6px 0;transition:color 0.2s}
+.nav-item svg{width:20px;height:20px;fill:currentColor}
+.nav-item.active{color:var(--ball)}
+
+/* Wallet View */
+.wallet-header{background:var(--panel-bg);border:1px solid var(--panel-border);border-radius:16px;padding:16px;display:flex;justify-content:space-between;align-items:center}
+.wallet-phone{font-weight:800;font-size:15px;display:flex;align-items:center;gap:8px}
+.verified-badge{background:rgba(20,167,108,0.2);color:var(--win);font-size:11px;padding:3px 8px;border-radius:10px;border:1px solid rgba(20,167,108,0.4)}
+.wallet-box{background:var(--panel-bg);border:1px solid var(--panel-border);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:6px}
+.wallet-box .lbl{font-size:13px;color:var(--muted)}
+.wallet-box .val{font-family:'Bowlby One',sans-serif;font-size:26px;color:#fff}
+
+/* Profile View */
+.profile-header{display:flex;flex-direction:column;align-items:center;gap:10px;margin:10px 0}
+.avatar{width:70px;height:70px;border-radius:50%;background:var(--panel-border);border:2px solid var(--ball);display:flex;align-items:center;justify-content:center;font-family:'Bowlby One',sans-serif;font-size:28px;color:var(--ball)}
+.profile-name{font-size:20px;font-weight:800}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.profile-card{background:var(--panel-bg);border:1px solid var(--panel-border);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:4px}
+.profile-card .lbl{font-size:12px;color:var(--muted)}
+.profile-card .val{font-size:20px;font-weight:800;color:var(--ball)}
+.settings-box{background:var(--panel-bg);border:1px solid var(--panel-border);border-radius:16px;padding:16px;display:flex;justify-content:space-between;align-items:center}
+
+/* History View */
+.history-total{background:var(--panel-bg);border:1px solid var(--panel-border);border-radius:16px;padding:16px}
+.history-total .lbl{font-size:13px;color:var(--muted)}
+.history-total .val{font-family:'Bowlby One',sans-serif;font-size:28px;color:#fff;margin-top:4px}
+.history-item{background:var(--panel-bg);border:1px solid var(--panel-border);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.history-item-top{display:flex;justify-content:space-between;align-items:center}
+.game-id{font-weight:800;font-size:14px}
+.badge-status{background:rgba(230,0,126,0.2);color:var(--dauber);font-size:11px;padding:3px 8px;border-radius:8px;font-weight:800}
+.history-details{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;font-size:12px;text-align:center;color:var(--muted)}
+.history-details b{color:#fff;display:block;font-size:13px;margin-top:2px}
+
+/* Modal / Sheets */
+.modal{position:fixed;inset:0;background:rgba(10,5,20,0.85);display:flex;align-items:flex-end;justify-content:center;z-index:100;backdrop-filter:blur(5px)}
+.modal-box{width:100%;max-width:480px;background:#201138;border:1px solid var(--panel-border);border-radius:24px 24px 0 0;padding:20px;display:flex;flex-direction:column;gap:16px;max-height:85vh;overflow-y:auto}
+.modal-title{font-family:'Bowlby One',sans-serif;font-size:18px;text-align:center;color:var(--ball)}
+.modal-body{font-size:14px;color:var(--muted);line-height:1.5;display:flex;flex-direction:column;gap:10px}
+.modal-body b{color:var(--paper)}
+
+/* In-game Active Screen (Lobby/Board/Caller) */
+#gameContainer{flex:1;display:flex;flex-direction:column;gap:10px;padding:10px 16px 80px}
 .infobar{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted);font-weight:800}
 .infobar #timer{color:var(--ball);font-size:15px}
 .greet{text-align:center;font-weight:800;font-size:15px;min-height:20px}
-
-.screen{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
 
 /* caller */
 .caller{display:flex;align-items:center;gap:14px;flex:none}
 .ball{width:68px;height:68px;flex:none;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFE79A 0,var(--ball) 55%,#E0A41A 100%);color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Bowlby One',sans-serif;line-height:1;box-shadow:0 4px 0 #9A6B00}
 .ball small{font-size:14px}
 .ball b{font-size:26px;font-weight:400}
-.ball.empty{background:var(--hall-deep);box-shadow:none;border:3px dashed var(--muted);color:var(--muted);font-size:11px;font-family:'Nunito',sans-serif;font-weight:800;text-align:center}
+.ball.empty{background:#150a24;box-shadow:none;border:3px dashed var(--muted);color:var(--muted);font-size:11px;font-family:'Nunito',sans-serif;font-weight:800;text-align:center}
 .ball.pop{animation:pop .35s ease-out}
 @keyframes pop{0%{transform:scale(.6)}70%{transform:scale(1.08)}100%{transform:scale(1)}}
 .callinfo{flex:1;min-width:0}
 .callinfo .count{font-size:13px;color:var(--muted);margin-bottom:4px}
 .recent{display:flex;gap:5px;flex-wrap:nowrap;min-height:28px}
-.recent span{background:var(--hall-deep);border:2px solid var(--ball);color:var(--ball);border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800}
+.recent span{background:#150a24;border:2px solid var(--ball);color:var(--ball);border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800}
 
 /* card */
-.cardbox{width:clamp(250px,calc((100dvh - 350px) / 1.2),100%);align-self:center;flex:none}
-.cardbox.sm{width:min(100%,300px)}
-.card{background:var(--paper);color:var(--ink);border-radius:14px;padding:8px;box-shadow:0 5px 0 var(--hall-deep);container-type:inline-size;width:100%}
+.cardbox{width:clamp(250px,calc((100dvh - 380px) / 1.2),100%);align-self:center;flex:none}
+.card{background:var(--paper);color:var(--ink);border-radius:14px;padding:8px;box-shadow:0 5px 0 #150a24;container-type:inline-size;width:100%}
 .head,.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
 .head{margin-bottom:4px}
 .head div{font-family:'Bowlby One',sans-serif;font-size:clamp(18px,8cqw,28px);text-align:center;color:var(--dauber);line-height:1.1}
@@ -61,90 +131,233 @@ button.cell:active{transform:scale(.94)}
 .cell.win{background:var(--win);color:#fff}
 .cardlabel{text-align:center;color:var(--muted);font-size:13px;margin-top:8px}
 
-/* called-number board */
-.board{background:var(--paper);border-radius:14px;padding:8px;box-shadow:0 5px 0 var(--hall-deep);display:grid;grid-template-columns:repeat(5,1fr);gap:3px;container-type:inline-size}
+/* board */
+.board{background:var(--paper);border-radius:14px;padding:8px;box-shadow:0 5px 0 #150a24;display:grid;grid-template-columns:repeat(5,1fr);gap:3px;container-type:inline-size}
 .board .bh{font-family:'Bowlby One',sans-serif;text-align:center;color:var(--dauber);font-size:18px}
 .board .bn{text-align:center;border-radius:6px;background:#fff;color:#9AA8A0;font-size:clamp(11px,4.5cqw,15px);font-weight:800;padding:2px 0}
 .board .bn.on{background:var(--ball);color:var(--ink)}
 .board .bn.last{background:var(--dauber);color:#fff}
 
-/* lobby */
+/* lobby grid */
 .hint{color:var(--muted);font-size:13px;text-align:center}
 .pgrid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;padding:2px}
-.pc{border:0;border-radius:10px;height:38px;background:var(--paper);color:var(--ink);font:inherit;font-weight:800;font-size:14px;cursor:pointer}
+.pc{border:0;border-radius:10px;height:38px;background:var(--panel-bg);color:var(--paper);font:inherit;font-weight:800;font-size:14px;cursor:pointer;border:1px solid var(--panel-border)}
 .pc.taken{opacity:.28;cursor:not-allowed}
-.pc.mine{background:var(--dauber);color:#fff}
+.pc.mine{background:var(--dauber);color:#fff;border:0}
 
-/* controls */
+/* status and controls */
 .status{min-height:20px;text-align:center;font-weight:800;font-size:14px;flex:none}
 .status.bad{color:#FF8FA3}
 .status.good{color:var(--ball)}
 .row{display:flex;gap:8px;flex:none}
-button.btn{flex:1;border:0;border-radius:12px;padding:12px 4px;font:inherit;font-weight:800;font-size:14px;cursor:pointer;background:var(--hall-deep);color:var(--paper);box-shadow:0 4px 0 #0E0820}
+button.btn{flex:1;border:0;border-radius:12px;padding:12px 4px;font:inherit;font-weight:800;font-size:14px;cursor:pointer;background:#150a24;color:var(--paper);box-shadow:0 4px 0 #0E0820}
 button.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #0E0820}
 button.btn.bingo{flex:2.2;background:var(--dauber);color:#fff;font-family:'Bowlby One',sans-serif;font-weight:400;font-size:20px;box-shadow:0 4px 0 #8A004B}
 button.btn.primary{background:var(--dauber);color:#fff;box-shadow:0 4px 0 #8A004B}
 button.btn:disabled{opacity:.45}
-
-/* bottom sheet + setup */
-#sheet{position:fixed;inset:0;background:rgba(10,5,20,.8);display:flex;align-items:flex-end;justify-content:center;z-index:5}
-.sheetbox{width:100%;max-width:480px;background:var(--hall);border-radius:18px 18px 0 0;padding:14px 14px 18px;display:flex;flex-direction:column;gap:10px;align-items:stretch}
-.sheetbox h3{margin:0;text-align:center;font-size:18px}
-#setup,#wait{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;color:var(--muted);padding:20px}
-#setup b{color:var(--ball)}
-@media (prefers-reduced-motion:reduce){.ball.pop{animation:none}button.cell{transition:none}}
 </style>
 </head>
 <body>
 <div id="app">
-  <div class="brand">
-    <div class="brand-am">መዝናኛ ቢንጎ</div>
-    <div class="brand-motto">እየተዝናኑ ያሸንፉ</div>
-    <div class="brand-motto-en">Win while having fun!</div>
-  </div>
-
-  <div id="setup" hidden>
-    <b>Almost ready</b>
-    <div>Paste your Firebase settings into <b>index.html</b> (the FIREBASE_CONFIG block near the top of the script), then reload.</div>
-  </div>
-  <div id="wait">Connecting…</div>
-
-  <div id="main" hidden style="display:contents">
-    <div class="infobar"><span id="roundLbl"></span><span id="timer"></span></div>
-    <div class="greet" id="greet"></div>
-
-    <div class="screen" id="lobby" hidden>
-      <div id="lobbyBody"></div>
+  <!-- Top Bar -->
+  <div class="topbar">
+    <div class="logo-area">
+      <div class="logo-badge">መ</div>
+      <div class="logo-title">Meznagna Bingo</div>
     </div>
+    <button class="rules-btn" id="rulesOpen">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Rules
+    </button>
+  </div>
 
-    <div class="screen" id="game" hidden>
-      <div class="caller">
-        <div class="ball empty" id="ball">Waiting</div>
-        <div class="callinfo">
-          <div class="count" id="count">0 of 75 called</div>
-          <div class="recent" id="recent"></div>
+  <!-- Content Views Container -->
+  <div class="content" id="mainContent">
+    
+    <!-- GAME VIEW -->
+    <div class="view" id="viewGame">
+      <div id="setupView" hidden class="welcome-box">
+        <b>Almost ready</b>
+        <div>Configure your FIREBASE_CONFIG in index.html.</div>
+      </div>
+      <div id="waitView" class="welcome-box" style="margin:auto;color:var(--muted)">Connecting…</div>
+      
+      <div id="activeGameWrapper" hidden style="display:flex;flex-direction:column;gap:14px;flex:1">
+        <div class="welcome-box" style="margin:0">
+          <div class="welcome-title">Welcome to <span>Meznagna Bingo</span></div>
+        </div>
+
+        <div class="stake-card" id="homeLobbyCard">
+          <div class="stake-title">⚡ Choose Your Stake</div>
+          <button class="stake-btn p10" id="startPlayBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Play 10 ETB Game
+          </button>
+        </div>
+
+        <div class="stats-card">
+          <div class="stat-item">
+            <div class="num" id="totalGamesStat">6+</div>
+            <div class="lbl">Games Played</div>
+          </div>
+          <div class="stat-item">
+            <div class="num">500+</div>
+            <div class="lbl">Active Winners</div>
+          </div>
         </div>
       </div>
-      <div class="cardbox" id="cardArea"></div>
+
+      <!-- In-round Active UI Container -->
+      <div id="ingameUI" hidden style="display:flex;flex-direction:column;gap:10px;flex:1">
+        <div class="infobar"><span id="roundLbl"></span><span id="timer"></span></div>
+        <div class="greet" id="greet"></div>
+
+        <div class="screen" id="lobby" hidden>
+          <div id="lobbyBody"></div>
+        </div>
+
+        <div class="screen" id="game" hidden>
+          <div class="caller">
+            <div class="ball empty" id="ball">Waiting</div>
+            <div class="callinfo">
+              <div class="count" id="count">0 of 75 called</div>
+              <div class="recent" id="recent"></div>
+            </div>
+          </div>
+          <div class="cardbox" id="cardArea"></div>
+        </div>
+
+        <div class="status" id="status"></div>
+
+        <div class="row" id="controls" hidden>
+          <button class="btn" id="boardBtn">Board</button>
+          <button class="btn" id="autoBtn">Auto: Off</button>
+          <button class="btn bingo" id="bingoBtn" disabled>BINGO!</button>
+        </div>
+      </div>
     </div>
 
-    <div class="status" id="status"></div>
+    <!-- HISTORY VIEW -->
+    <div class="view" id="viewHistory" hidden>
+      <div class="history-total">
+        <div class="lbl">Total Games</div>
+        <div class="val" id="histTotalCount">6</div>
+      </div>
+      <div style="font-size:14px;font-weight:800;color:var(--muted);margin-top:4px">Recent Games</div>
+      <div style="display:flex;flex-direction:column;gap:10px" id="historyListContainer">
+        <div class="history-item">
+          <div class="history-item-top">
+            <div class="game-id">Game BBPFRG7R</div>
+            <div class="badge-status">Finished</div>
+          </div>
+          <div class="history-details">
+            <div>Stake <b>10</b></div>
+            <div>Cards <b>452</b></div>
+            <div>Prize <b>4,688</b></div>
+            <div>Winners <b>3</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    <div class="row" id="controls" hidden>
-      <button class="btn" id="boardBtn">Board</button>
-      <button class="btn" id="autoBtn">Auto: Off</button>
-      <button class="btn bingo" id="bingoBtn" disabled>BINGO!</button>
+    <!-- WALLET VIEW -->
+    <div class="view" id="viewWallet" hidden>
+      <div class="wallet-header">
+        <div class="wallet-phone" id="walletPhoneDisplay">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Loading...
+        </div>
+        <div class="verified-badge">✓ Verified</div>
+      </div>
+      <div class="wallet-box">
+        <div class="lbl">Main Wallet (Deposits)</div>
+        <div class="val" id="mainWalletVal">0.00 ETB</div>
+      </div>
+      <div class="wallet-box">
+        <div class="lbl">Play Wallet (Bonus)</div>
+        <div class="val" id="playWalletVal">50.0 ETB</div>
+      </div>
+    </div>
+
+    <!-- PROFILE VIEW -->
+    <div class="view" id="viewProfile" hidden>
+      <div class="profile-header">
+        <div class="avatar" id="profileInitial">E</div>
+        <div class="profile-name" id="profileNameDisplay">Player</div>
+      </div>
+      <div class="profile-grid">
+        <div class="profile-card">
+          <div class="lbl">Main Wallet</div>
+          <div class="val" id="profMainVal">0</div>
+        </div>
+        <div class="profile-card">
+          <div class="lbl">Play Wallet</div>
+          <div class="val" id="profPlayVal">50.0</div>
+        </div>
+        <div class="profile-card">
+          <div class="lbl">Games Won</div>
+          <div class="val">0</div>
+        </div>
+        <div class="profile-card">
+          <div class="lbl">Total Invite</div>
+          <div class="val">0</div>
+        </div>
+      </div>
+      <div class="profile-card" style="grid-column: span 2">
+        <div class="lbl">Total Earning</div>
+        <div class="val" id="profEarnings">0 ETB</div>
+      </div>
+      <div class="settings-box">
+        <div style="font-weight:800">Sound Effects</div>
+        <input type="checkbox" id="soundToggle" checked style="accent-color:var(--dauber);width:18px;height:18px">
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Navigation Bar -->
+  <nav class="navbar">
+    <button class="nav-item active" data-target="viewGame">
+      <svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm3-3c-.83 0-1.5-.67-1.5-1.5S17.67 9 18.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+      Game
+    </button>
+    <button class="nav-item" data-target="viewHistory">
+      <svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+      History
+    </button>
+    <button class="nav-item" data-target="viewWallet">
+      <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+      Wallet
+    </button>
+    <button class="nav-item" data-target="viewProfile">
+      <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      Profile
+    </button>
+  </nav>
+
+  <!-- Rules Modal -->
+  <div class="modal" id="rulesModal" hidden>
+    <div class="modal-box">
+      <div class="modal-title">📖 Game Rules & Instructions</div>
+      <div class="modal-body">
+        <div>• <b>Entry Fee:</b> Each game costs 10 ETB.</div>
+        <div>• <b>Bonus Funds:</b> 50 ETB sign-up bonus is for playing games only and cannot be withdrawn directly.</div>
+        <div>• <b>Payouts:</b> The winner receives 80% of the game pool (20% house margin).</div>
+        <div>• <b>Fair Play:</b> Numbers are drawn automatically. Mark your cards or turn on Auto-mark. Complete a line to call BINGO!</div>
+      </div>
+      <button class="btn primary" id="rulesClose">Got it</button>
     </div>
   </div>
-</div>
 
-<div id="sheet" hidden>
-  <div class="sheetbox">
-    <h3 id="sheetTitle"></h3>
-    <div class="cardbox sm" id="sheetCard" style="align-self:center"></div>
-    <div class="row">
-      <button class="btn" id="sheetBack">Back</button>
-      <button class="btn primary" id="sheetPlay">Play this cartela</button>
+  <!-- Cartela Selection Sheet -->
+  <div class="modal" id="sheet" hidden>
+    <div class="modal-box">
+      <h3 id="sheetTitle" class="modal-title" style="margin:0"></h3>
+      <div class="cardbox sm" id="sheetCard" style="align-self:center"></div>
+      <div class="row">
+        <button class="btn" id="sheetBack">Back</button>
+        <button class="btn primary" id="sheetPlay">Play this cartela</button>
+      </div>
     </div>
   </div>
 </div>
@@ -153,7 +366,7 @@ button.btn:disabled{opacity:.45}
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import { getDatabase, ref, onValue, remove, push, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
 
-/* ====== 1. PASTE YOUR FIREBASE SETTINGS HERE ====== */
+/* ====== FIREBASE SETTINGS ====== */
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyBZtealdtm83Ve_7BZG2QBL_n9DY29hjy8",
   authDomain: "bingo-83229.firebaseapp.com",
@@ -161,11 +374,11 @@ const FIREBASE_CONFIG = {
   projectId: "bingo-83229",
   appId: "1:395054581766:web:ed97ee344841ff17e79b87"
 };
-/* ================================================== */
+/* =============================== */
 
 const LOBBY_MS = 45000, CALL_MS = 4000, RESULT_MS = 12000, SLACK_MS = 1500, TOTAL_CARTELAS = 100;
 
-// ==LOGIC START==
+// Logic helpers
 function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 function shuffled(arr,rng){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 const cardCache={}, seqCache={};
@@ -177,9 +390,7 @@ function cardFor(k){
   card[2][2]=0;
   return cardCache[k]=card;
 }
-function seqFor(seed){
-  return seqCache[seed]||(seqCache[seed]=shuffled(Array.from({length:75},(_,i)=>i+1),mulberry32(seed)));
-}
+function seqFor(seed){ return seqCache[seed]||(seqCache[seed]=shuffled(Array.from({length:75},(_,i)=>i+1),mulberry32(seed))); }
 const LINES=(()=>{const L=[];for(let i=0;i<5;i++){L.push([0,1,2,3,4].map(k=>[i,k]));L.push([0,1,2,3,4].map(k=>[k,i]));}
   L.push([0,1,2,3,4].map(k=>[k,k]));L.push([0,1,2,3,4].map(k=>[k,4-k]));return L;})();
 function lineWon(card,called,isMarked){
@@ -187,14 +398,14 @@ function lineWon(card,called,isMarked){
 }
 function letterFor(n){return 'BINGO'[Math.floor((n-1)/15)];}
 function mmss(ms){const s=Math.max(0,Math.ceil(ms/1000));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
-// ==LOGIC END==
 
 const $=id=>document.getElementById(id);
 const tg=window.Telegram&&Telegram.WebApp;
 let me, myName;
 try{ if(tg){ tg.ready(); tg.expand(); } }catch(e){}
 try{ tg&&tg.disableVerticalSwipes&&tg.disableVerticalSwipes(); }catch(e){}
-try{ tg&&tg.setHeaderColor('#2A1B3D'); tg&&tg.setBackgroundColor('#2A1B3D'); }catch(e){}
+try{ tg&&tg.setHeaderColor('#1b0f2e'); tg&&tg.setBackgroundColor('#1b0f2e'); }catch(e){}
+
 (function(){
   let u=null; try{ u=tg&&tg.initDataUnsafe&&tg.initDataUnsafe.user; }catch(e){}
   if(u){ me=String(u.id); myName=u.username?'@'+u.username:(u.first_name||'Player'); }
@@ -203,13 +414,19 @@ try{ tg&&tg.setHeaderColor('#2A1B3D'); tg&&tg.setBackgroundColor('#2A1B3D'); }ca
     if(!g){g='g'+Math.random().toString(36).slice(2,8);try{localStorage.setItem('gid',g);}catch(e){}}
     me=g; myName='Guest '+g.slice(-3);
   }
+  $('profileNameDisplay').textContent=myName;
+  $('profileInitial').textContent=myName.replace('@','').charAt(0).toUpperCase();
+  $('walletPhoneDisplay').innerHTML=`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> ${me.length>8?me.slice(0,8)+'...':me}`;
 })();
-const buzz=t=>{try{tg&&tg.HapticFeedback.notificationOccurred(t);}catch(e){}};
-const tap=()=>{try{tg&&tg.HapticFeedback.impactOccurred('light');}catch(e){}};
 
-let db, offset=0, cur=null, picks={}, claims={}, picksLoaded=false, unsubP=null, unsubC=null;
+const buzz=t=>{try{if($('soundToggle').checked) tg&&tg.HapticFeedback.notificationOccurred(t);}catch(e){}};
+const tap=()=>{try{if($('soundToggle').checked) tg&&tg.HapticFeedback.impactOccurred('light');}catch(e){}};
+
+let db, offset=0, cur=null, picks={}, claims={}, picksLoaded=false, unsubP=null, unsubC=null, unsubU=null;
 let marks={}, auto=false, showBoard=false, changing=false, claimSent=false, chosen=null, selected=null, winNotified=false;
 let phase={name:'lobby',left:0}, lastSig='', flashMsg=null, advancing={id:0,at:0}, lastN=0;
+let inActiveGameSession=false;
+
 const now=()=>Date.now()+offset;
 const cm=()=>(cur&&cur.callMs)||CALL_MS;
 const pickCount=()=>Object.keys(picks).length;
@@ -247,7 +464,7 @@ function computePhase(){
   return {name:'finished'};
 }
 
-/* ---------- database ---------- */
+// Database sync
 function newRound(prevId){
   return {id:prevId+1,seed:Math.floor(Math.random()*2147483647),lobbyEnd:Date.now()+offset+LOBBY_MS,callMs:CALL_MS};
 }
@@ -296,7 +513,7 @@ function pressBingo(){
   flash('Bingo sent. Checking…','good'); render();
 }
 
-/* ---------- rendering ---------- */
+// Rendering
 function isMarked(card,called){
   return (r,c)=>{const n=card[r][c];return n===0||!!marks[r*5+c]||(auto&&called.has(n));};
 }
@@ -332,10 +549,7 @@ function buildBoard(n){
   }
   return b;
 }
-function show(id){
-  for(const x of ['wait','setup']) $(x).hidden=(x!==id);
-  $('main').hidden=(id!=='main');
-}
+
 function renderLobby(mine){
   $('lobby').hidden=false; $('game').hidden=true; $('controls').hidden=true;
   const box=$('lobbyBody'); box.innerHTML='';
@@ -368,6 +582,7 @@ function renderLobby(mine){
     }
   }
 }
+
 function renderGame(mine){
   $('lobby').hidden=true; $('game').hidden=false; $('controls').hidden=false;
   const n=phase.n||0, seq=seqFor(cur.seed), ball=$('ball');
@@ -399,17 +614,18 @@ function renderGame(mine){
   $('autoBtn').textContent='Auto: '+(auto?'On':'Off');
   $('bingoBtn').disabled=!(mine!==null&&phase.name==='play'&&!claimSent);
 }
+
 function render(){
-  if(!cur){show('wait');return;}
-  show('main');
+  if(!cur) return;
   phase=computePhase();
   const mine=myCartela(), inLobby=phase.name==='lobby';
-  $('greet').textContent=mine!==null?('Good luck, '+myName+'!'):inLobby?('Welcome, '+myName+'! Pick your cartela.'):('Hi '+myName+', you can join the next round.');
+  $('greet').textContent=mine!==null?('Good luck, '+myName+'!'):inLobby?('Welcome, '+myName+'! Pick your cartela.'):('Hi '+myName+', join the next round.');
   const pc=pickCount();
   $('roundLbl').textContent='Round '+cur.id+' · '+pc+' player'+(pc===1?'':'s');
   if(inLobby) renderLobby(mine); else renderGame(mine);
   updateTimer(); updateStatus();
 }
+
 function updateTimer(){
   if(!cur) return;
   const p=phase; let t='';
@@ -437,7 +653,7 @@ function updateStatus(){
   s.textContent=text; s.className='status '+cls;
 }
 
-/* ---------- sheet ---------- */
+// Sheet modal
 function openSheet(k){
   selected=k; $('sheetTitle').textContent='Cartela #'+k;
   const box=$('sheetCard'); box.innerHTML=''; box.appendChild(buildCard(cardFor(k),{}));
@@ -445,9 +661,8 @@ function openSheet(k){
 }
 function closeSheet(){ $('sheet').hidden=true; selected=null; }
 
-/* ---------- tick ---------- */
 function tick(){
-  if(!cur) return;
+  if(!cur||!inActiveGameSession) return;
   phase=computePhase();
   if(phase.name==='finished'||(phase.name!=='lobby'&&picksLoaded&&pickCount()===0)) advance();
   if(phase.name==='over'&&phase.win&&phase.win.uid===me&&!winNotified){winNotified=true;buzz('success');}
@@ -460,24 +675,60 @@ function tick(){
   updateTimer(); updateStatus();
 }
 
-/* ---------- start ---------- */
+// Navigation and UI wiring
+document.querySelectorAll('.navbar .nav-item').forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll('.navbar .nav-item').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.content .view').forEach(v=>v.hidden=true);
+    btn.classList.add('active');
+    $(btn.dataset.target).hidden=false;
+    tap();
+  };
+});
+
+$('startPlayBtn').onclick=()=>{
+  inActiveGameSession=true;
+  $('activeGameWrapper').hidden=true;
+  $('ingameUI').hidden=false;
+  render();
+  tap();
+};
+
+$('rulesOpen').onclick=()=>{ $('rulesModal').hidden=false; tap(); };
+$('rulesClose').onclick=()=>{ $('rulesModal').hidden=true; tap(); };
+
 $('boardBtn').onclick=()=>{showBoard=!showBoard;render();};
 $('autoBtn').onclick=()=>{auto=!auto;render();};
 $('bingoBtn').onclick=pressBingo;
 $('sheetBack').onclick=closeSheet;
 $('sheetPlay').onclick=()=>{ if(selected!==null) chooseCartela(selected); };
 
-if(!FIREBASE_CONFIG.apiKey||FIREBASE_CONFIG.apiKey.startsWith('PASTE')){ show('setup'); }
-else{
-  show('wait');
+// Firebase bootstrap
+if(!FIREBASE_CONFIG.apiKey||FIREBASE_CONFIG.apiKey.startsWith('PASTE')){
+  $('setupView').hidden=false; $('waitView').hidden=true;
+} else{
   db=getDatabase(initializeApp(FIREBASE_CONFIG));
   onValue(ref(db,'.info/serverTimeOffset'),s=>{offset=s.val()||0;});
   onValue(ref(db,'current'),s=>{
     const v=s.val();
     if(!v){ensureRound();return;}
     if(!cur||cur.id!==v.id) switchRound(v); else cur=v;
-    render();
+    if(inActiveGameSession) render();
   });
+  
+  // Sync user balances for Wallet and Profile views
+  unsubU=onValue(ref(db,'users/'+me),s=>{
+    const u=s.val()||{deposit_balance:0.0,bonus_balance:50.0};
+    const dep=u.deposit_balance||0.0;
+    const bon=u.bonus_balance||50.0;
+    $('mainWalletVal').textContent=dep.toFixed(2)+' ETB';
+    $('playWalletVal').textContent=bon.toFixed(2)+' ETB';
+    $('profMainVal').textContent=dep.toFixed(0);
+    $('profPlayVal').textContent=bon.toFixed(1);
+    $('profEarnings').textContent=dep.toFixed(2)+' ETB';
+  });
+
+  $('setupView').hidden=true; $('waitView').hidden=true; $('activeGameWrapper').hidden=false;
   setInterval(tick,250);
 }
 </script>
