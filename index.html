@@ -247,7 +247,7 @@ button.btn:disabled{opacity:.45}
 
         <div class="greet" id="greet"></div>
 
-        <div class="screen" id="lobby" hidden>
+        <div class="screen" id="lobby">
           <div id="lobbyBody"></div>
         </div>
 
@@ -713,7 +713,6 @@ function render(){
   
   $('greet').textContent=mine!==null?(`Good luck, ${myName}! Pool: ${totalPool} ETB (Win: ${prizePool} ETB)`):inLobby?(`Welcome, ${myName}! Pool: ${totalPool} ETB`):(`Hi ${myName}, join the next round.`);
   const pc=pickCount();
-  $('roundLbl').textContent='Round '+cur.id+' · '+pc+' player'+(pc===1?'':'s');
   
   if(inActiveGameSession) {
     if(inLobby) {
