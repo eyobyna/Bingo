@@ -382,7 +382,7 @@ const FIREBASE_CONFIG = {
 };
 /* =============================== */
 
-const LOBBY_MS = 45000, CALL_MS = 4000, RESULT_MS = 12000, SLACK_MS = 1500, TOTAL_CARTELAS = 100;
+const LOBBY_MS = 45000, CALL_MS = 4000, RESULT_MS = 12000, SLACK_MS = 1500, TOTAL_CARTELAS = 100, STAKE_AMOUNT = 10;
 
 function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 function shuffled(arr,rng){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
@@ -431,6 +431,7 @@ let db, offset=0, cur=null, picks={}, claims={}, picksLoaded=false, unsubP=null,
 let marks={}, auto=false, showBoard=false, changing=false, claimSent=false, chosen=null, selected=null, winNotified=false;
 let phase={name:'lobby',left:0}, lastSig='', flashMsg=null, advancing={id:0,at:0}, lastN=0;
 let inActiveGameSession=false;
+let userWallet={deposit_balance:0, bonus_balance:50};
 
 const now=()=>Date.now()+offset;
 const cm=()=>(cur&&cur.callMs)||CALL_MS;
@@ -494,18 +495,67 @@ function switchRound(v){
   unsubP=onValue(ref(db,'rounds/'+v.id+'/picks'),s=>{picks=s.val()||{};picksLoaded=true;lastSig='';render();});
   unsubC=onValue(ref(db,'rounds/'+v.id+'/claims'),s=>{claims=s.val()||{};});
 }
+
+// Choose Cartela with 10 ETB deduction logic
 async function chooseCartela(k){
   if(!cur||phase.name!=='lobby'||phase.left<2500){ flash('Too late. Wait for the next round.','bad'); closeSheet(); return; }
+  
+  // Check if player has enough total balance (Deposit + Bonus)
+  const totalBal = (userWallet.deposit_balance || 0) + (userWallet.bonus_balance || 0);
+  if(totalBal < STAKE_AMOUNT){
+    flash('Insufficient balance! You need at least 10 ETB to play.','bad');
+    buzz('error'); closeSheet(); return;
+  }
+
   const roundId=cur.id;
   try{
+    // Deduct 10 ETB from user balance first (deducting from bonus first, then deposit)
+    let bonus = userWallet.bonus_balance || 0;
+    let deposit = userWallet.deposit_balance || 0;
+    
+    if(bonus >= STAKE_AMOUNT){
+      bonus -= STAKE_AMOUNT;
+    } else {
+      const remainder = STAKE_AMOUNT - bonus;
+      bonus = 0;
+      deposit -= remainder;
+    }
+
+    // Attempt to take cartela slot in Firebase
     const res=await runTransaction(ref(db,'rounds/'+roundId+'/picks/'+k),c=>c===null?{uid:me,name:myName}:undefined);
     const val=res.snapshot.val();
-    if(!(res.committed||(val&&val.uid===me))){ flash('Cartela #'+k+' was just taken. Pick another.','bad'); buzz('error'); closeSheet(); return; }
+    if(!(res.committed||(val&&val.uid===me))){ 
+      flash('Cartela #'+k+' was just taken. Pick another.','bad'); 
+      buzz('error'); closeSheet(); return; 
+    }
+
+    // If successfully secured, update the user wallet in Firebase
+    await runTransaction(ref(db,'users/'+me), currentUsr => {
+      const curDep = currentUsr ? (currentUsr.deposit_balance || 0) : 0;
+      const curBon = currentUsr ? (currentUsr.bonus_balance || 50) : 50;
+      
+      let newBon = curBon;
+      let newDep = curDep;
+      if(newBon >= STAKE_AMOUNT){
+        newBon -= STAKE_AMOUNT;
+      } else {
+        const rem = STAKE_AMOUNT - newBon;
+        newBon = 0;
+        newDep -= rem;
+      }
+      return { deposit_balance: newDep, bonus_balance: newBon };
+    });
+
     chosen=k; changing=false;
-    for(const o of Object.keys(picks)){ if(Number(o)!==k&&picks[o]&&picks[o].uid===me) remove(ref(db,'rounds/'+roundId+'/picks/'+o)).catch(()=>{}); }
+    for(const o of Object.keys(picks)){ 
+      if(Number(o)!==k&&picks[o]&&picks[o].uid===me) {
+        remove(ref(db,'rounds/'+roundId+'/picks/'+o)).catch(()=>{}); 
+      }
+    }
     buzz('success'); closeSheet(); render();
   }catch(e){ flash('Connection problem. Try again.','bad'); closeSheet(); }
 }
+
 function pressBingo(){
   const mine=myCartela();
   if(!cur||phase.name!=='play'||mine===null||claimSent) return;
@@ -625,7 +675,10 @@ function render(){
   if(!cur) return;
   phase=computePhase();
   const mine=myCartela(), inLobby=phase.name==='lobby';
-  $('greet').textContent=mine!==null?('Good luck, '+myName+'!'):inLobby?('Welcome, '+myName+'! Pick your cartela.'):('Hi '+myName+', join the next round.');
+  const totalPool = pickCount() * STAKE_AMOUNT;
+  const prizePool = totalPool * 0.80; // 80% to winner, 20% to house
+  
+  $('greet').textContent=mine!==null?(`Good luck, ${myName}! Pool: ${totalPool} ETB (Win: ${prizePool} ETB)`):inLobby?(`Welcome, ${myName}! Pool: ${totalPool} ETB`):(`Hi ${myName}, join the next round.`);
   const pc=pickCount();
   $('roundLbl').textContent='Round '+cur.id+' · '+pc+' player'+(pc===1?'':'s');
   if(inLobby) renderLobby(mine); else renderGame(mine);
@@ -647,20 +700,34 @@ function updateStatus(){
   if(flashMsg&&Date.now()<flashMsg.until){text=flashMsg.text;cls=flashMsg.cls||'';}
   else if(cur){
     const mine=myCartela();
+    const totalPool = pickCount() * STAKE_AMOUNT;
+    const prizePool = totalPool * 0.80;
     if(phase.name==='over'){
       if(phase.win){
-        if(phase.win.uid===me){text='You won! Congratulations!';cls='good';}
-        else text=phase.win.name+' won with cartela #'+phase.win.cartela;
+        if(phase.win.uid===me){
+          text=`You won ${prizePool} ETB! Congratulations!`;
+          cls='good';
+          // Payout 80% to winner's deposit balance once per win
+          if(!winNotified){
+            winNotified=true;
+            runTransaction(ref(db,'users/'+me), u => {
+              const dep = u ? (u.deposit_balance || 0) : 0;
+              const bon = u ? (u.bonus_balance || 50) : 50;
+              return { deposit_balance: dep + prizePool, bonus_balance: bon };
+            }).catch(()=>{});
+          }
+        }
+        else text=phase.win.name+' won '+prizePool+' ETB with cartela #'+phase.win.cartela;
       } else text='No winner this round.';
     } else if(phase.name==='play'){
-      text=mine!==null?'Mark called numbers. Complete a line, then press BINGO!':'Round in progress. Join the next round.';
+      text=mine!==null?`Mark numbers. Prize Pool: ${prizePool} ETB`:'Round in progress. Join next round.';
     }
   }
   s.textContent=text; s.className='status '+cls;
 }
 
 function openSheet(k){
-  selected=k; $('sheetTitle').textContent='Cartela #'+k;
+  selected=k; $('sheetTitle').textContent='Cartela #'+k+' (10 ETB)';
   const box=$('sheetCard'); box.innerHTML=''; box.appendChild(buildCard(cardFor(k),{}));
   $('sheet').hidden=false;
 }
@@ -746,6 +813,7 @@ if(!FIREBASE_CONFIG.apiKey||FIREBASE_CONFIG.apiKey.startsWith('PASTE')){
   
   unsubU=onValue(ref(db,'users/'+me),s=>{
     const u=s.val()||{deposit_balance:0.0,bonus_balance:50.0};
+    userWallet = u; // cache local wallet snapshot
     const dep=u.deposit_balance||0.0;
     const bon=u.bonus_balance||50.0;
     $('mainWalletVal').textContent=dep.toFixed(2)+' ETB';
