@@ -40,10 +40,12 @@ body{display:flex;justify-content:center}
 .view{display:flex;flex-direction:column;gap:16px;flex:1}
 
 /* Home / Game View */
-.welcome-box{text-align:center;margin:6px 0 2px}
-.welcome-title{font-size:22px;font-weight:800;line-height:1.3}
+.welcome-box{text-align:center;margin:6px 0 2px;display:flex;flex-direction:column;gap:4px}
+.welcome-title{font-size:21px;font-weight:800;line-height:1.3}
 .welcome-title span{color:var(--ball)}
-.welcome-motto{font-size:13px;color:var(--muted);margin-top:4px;font-weight:700}
+.welcome-motto{font-size:13px;color:var(--muted);font-weight:700}
+.welcome-amharic-title{font-size:18px;font-weight:800;color:var(--paper);margin-top:6px}
+.welcome-amharic-motto{font-size:13px;color:var(--ball);font-weight:700}
 
 .stake-card{background:var(--panel-bg);border:1px solid var(--panel-border);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:14px;backdrop-filter:blur(10px);box-shadow:0 8px 32px rgba(0,0,0,0.3)}
 .stake-title{text-align:center;font-size:14px;color:var(--ball);font-weight:800;letter-spacing:1px;text-transform:uppercase}
@@ -115,8 +117,8 @@ body{display:flex;justify-content:center}
 .recent{display:flex;gap:5px;flex-wrap:nowrap;min-height:28px}
 .recent span{background:#150a24;border:2px solid var(--ball);color:var(--ball);border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800}
 
-/* card */
-.cardbox{width:clamp(250px,calc((100dvh - 380px) / 1.2),100%);align-self:center;flex:none}
+/* Centered & Responsive Card / Cartela Layout */
+.cardbox{width:100%;max-width:360px;margin:0 auto;flex:none}
 .cardbox.sm{width:min(100%,300px)}
 .card{background:var(--paper);color:var(--ink);border-radius:14px;padding:8px;box-shadow:0 5px 0 #150a24;container-type:inline-size;width:100%}
 .head,.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
@@ -133,9 +135,9 @@ button.cell:active{transform:scale(.94)}
 .cardlabel{text-align:center;color:var(--muted);font-size:13px;margin-top:8px}
 
 /* board */
-.board{background:var(--paper);border-radius:14px;padding:8px;box-shadow:0 5px 0 #150a24;display:grid;grid-template-columns:repeat(5,1fr);gap:3px;container-type:inline-size}
+.board{background:var(--paper);border-radius:14px;padding:8px;box-shadow:0 5px 0 #150a24;display:grid;grid-template-columns:repeat(5,1fr);gap:3px;container-type:inline-size;width:100%;max-width:360px;margin:0 auto}
 .board .bh{font-family:'Bowlby One',sans-serif;text-align:center;color:var(--dauber);font-size:18px}
-.board .bn{text-align:center;border-radius:6px;background:#fff;color:#9AA8A0;font-size:clamp(11px,4.5cqw,15px);font-weight:800;padding:2px 0}
+.board .bn{text-align:center;border-radius:6px;background:#fff;color:#9AA8A0;font-size:clamp(11px,4.5cqw,15px);font-weight:800;padding:6px 0}
 .board .bn.on{background:var(--ball);color:var(--ink)}
 .board .bn.last{background:var(--dauber);color:#fff}
 
@@ -190,7 +192,9 @@ button.btn:disabled{opacity:.45}
       <div id="activeGameWrapper" hidden style="display:flex;flex-direction:column;gap:14px;flex:1">
         <div class="welcome-box" style="margin:0">
           <div class="welcome-title">Welcome to <span>Meznagna Bingo</span></div>
-          <div class="welcome-motto">እየተዝናኑ ያሸንፉ / Win while having fun!</div>
+          <div class="welcome-motto">Win while having fun!</div>
+          <div class="welcome-amharic-title">እንኳን ወደ መዝናኛ ቢንጎ በደህና መጡ</div>
+          <div class="welcome-amharic-motto">እየተዝናኑ ያሸንፉ!</div>
         </div>
 
         <div class="stake-card" id="homeLobbyCard">
@@ -420,28 +424,6 @@ try{ tg&&tg.setHeaderColor('#1b0f2e'); tg&&tg.setBackgroundColor('#1b0f2e'); }ca
   $('walletPhoneDisplay').innerHTML=`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> ${me.length>8?me.slice(0,8)+'...':me}`;
 })();
 
-// Audio & Speech Synthesis
-const speakBall = (num) => {
-  if(!$('soundToggle').checked) return;
-  if('speechSynthesis' in window) {
-    window.speechSynthesis.cancel();
-    const letter = letterFor(num);
-    const textToSpeak = `${letter}, ${num}`;
-    const utterance = new SpeechSynthesisUtterance(textToSpeak);
-    utterance.rate = 1.0;
-    utterance.pitch = 1.0;
-    utterance.lang = 'en-US';
-    
-    const voices = window.speechSynthesis.getVoices();
-    const engVoice = voices.find(v => v.lang.startsWith('en') || v.lang.startsWith('en-US'));
-    if(engVoice) {
-      utterance.voice = engVoice;
-    }
-
-    window.speechSynthesis.speak(utterance);
-  }
-};
-
 const buzz=t=>{try{if($('soundToggle').checked) tg&&tg.HapticFeedback.notificationOccurred(t);}catch(e){}};
 const tap=()=>{if($('soundToggle').checked){try{tg&&tg.HapticFeedback.impactOccurred('light');}catch(e){}}};
 
@@ -614,7 +596,6 @@ function renderGame(mine){
     if(n!==lastN){
       void ball.offsetWidth;
       ball.classList.add('pop');
-      speakBall(num); // Speech synthesis triggered aloud!
     }
   }
   $('count').textContent=n+' of 75 called';
@@ -734,14 +715,6 @@ $('globalBackBtn').onclick=()=>{
 };
 
 $('startPlayBtn').onclick=()=>{
-  // Wake up speech engine inside user gesture click handler to bypass mobile autoplay blocks
-  if('speechSynthesis' in window) {
-    window.speechSynthesis.cancel();
-    const wakeUp = new SpeechSynthesisUtterance(' ');
-    wakeUp.volume = 0;
-    window.speechSynthesis.speak(wakeUp);
-  }
-  
   inActiveGameSession=true;
   $('activeGameWrapper').hidden=true;
   $('ingameUI').hidden=false;
