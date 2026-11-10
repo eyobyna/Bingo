@@ -88,6 +88,7 @@ button.btn:disabled{opacity:.45}
 .brand{text-align:center;line-height:1.1}
 .brand-am{font-size:28px;font-weight:800;color:var(--ball);font-family:'Bowlby One',sans-serif}
 .brand-motto{font-size:13px;color:var(--paper);margin-top:2px}
+.voice-toggle{background:rgba(230,0,126,0.2);border:1px solid var(--dauber);color:var(--paper);padding:6px 12px;border-radius:20px;font-size:12px;font-weight:800;cursor:pointer;margin:0 auto;display:flex;align-items:center;gap:6px;}
 @media (prefers-reduced-motion:reduce){.ball.pop{animation:none}.cell{transition:none}}
 </style>
 </head>
@@ -99,6 +100,10 @@ button.btn:disabled{opacity:.45}
       <div class="brand-am">መዝናኛ ቢንጎ</div>
       <div class="brand-motto">እየተዝናኑ ያሸንፉ • Win while having fun!</div>
     </div>
+    
+    <!-- Voice Activation Button to bypass browser audio locks -->
+    <button class="voice-toggle" id="voiceToggleBtn" onclick="toggleVoice()">🔊 Enable Caller Voice</button>
+
     <div class="name" id="who">Good luck!</div>
 
     <div class="caller">
@@ -245,21 +250,36 @@ button.btn:disabled{opacity:.45}
 </script>
 
 <script>
+  let voiceEnabled = false;
+
+  function toggleVoice() {
+    voiceEnabled = !voiceEnabled;
+    const btn = document.getElementById('voiceToggleBtn');
+    if (voiceEnabled) {
+      btn.style.background = 'var(--win)';
+      btn.textContent = '🔊 Caller Voice: ON';
+      speakBall('Ready', 'Go');
+    } else {
+      btn.style.background = 'rgba(230,0,126,0.2)';
+      btn.textContent = '🔇 Caller Voice: OFF';
+    }
+  }
+
+  function speakBall(letter, number) {
+    if (!voiceEnabled || !('speechSynthesis' in window)) return;
+    try {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(`${letter} ... ${number}`);
+      utterance.rate = 1.0;
+      utterance.pitch = 1.1;
+      window.speechSynthesis.speak(utterance);
+    } catch(e) {}
+  }
+
 (function(){
   const tg = window.Telegram && Telegram.WebApp;
   const buzz = (t) => { try { tg && tg.HapticFeedback.notificationOccurred(t); } catch(e){} };
   const tap  = () => { try { tg && tg.HapticFeedback.impactOccurred('light'); } catch(e){} };
-
-  // Voice caller function using Web Speech API
-  function speakBall(letter, number) {
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel(); // Stop any overlapping speech
-      const utterance = new SpeechSynthesisUtterance(`${letter} ${number}`);
-      utterance.rate = 1.1; // Slightly upbeat
-      utterance.pitch = 1.0;
-      window.speechSynthesis.speak(utterance);
-    }
-  }
 
   const $ = id => document.getElementById(id);
   const LETTERS = 'BINGO';
@@ -280,7 +300,6 @@ button.btn:disabled{opacity:.45}
     renderCard(); renderCaller(null);
     setStatus('');
     
-    // Auto-start game on load with voice callouts active
     running = true; $('startBtn').textContent = 'Pause';
     $('nextBtn').disabled = false; $('bingoBtn').disabled = false;
     callNext();
@@ -313,7 +332,7 @@ button.btn:disabled{opacity:.45}
       const l = letterFor(n);
       ball.className = 'ball'; ball.innerHTML = `<small>${l}</small><b>${n}</b>`;
       void ball.offsetWidth; ball.classList.add('pop');
-      speakBall(l, n); // Triggers voice speech callout!
+      speakBall(l, n);
     }
     $('count').textContent = called.size + ' of 75 called';
     const hist = Array.from(called).slice(-6,-1).reverse();
