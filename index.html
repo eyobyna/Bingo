@@ -424,13 +424,20 @@ try{ tg&&tg.setHeaderColor('#1b0f2e'); tg&&tg.setBackgroundColor('#1b0f2e'); }ca
 const speakBall = (num) => {
   if(!$('soundToggle').checked) return;
   if('speechSynthesis' in window) {
-    window.speechSynthesis.cancel(); // Stop any overlapping speech
+    window.speechSynthesis.cancel();
     const letter = letterFor(num);
     const textToSpeak = `${letter}, ${num}`;
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
     utterance.rate = 1.0;
     utterance.pitch = 1.0;
     utterance.lang = 'en-US';
+    
+    const voices = window.speechSynthesis.getVoices();
+    const engVoice = voices.find(v => v.lang.startsWith('en') || v.lang.startsWith('en-US'));
+    if(engVoice) {
+      utterance.voice = engVoice;
+    }
+
     window.speechSynthesis.speak(utterance);
   }
 };
@@ -607,7 +614,7 @@ function renderGame(mine){
     if(n!==lastN){
       void ball.offsetWidth;
       ball.classList.add('pop');
-      speakBall(num); // Speaks out loud!
+      speakBall(num); // Speech synthesis triggered aloud!
     }
   }
   $('count').textContent=n+' of 75 called';
@@ -727,11 +734,12 @@ $('globalBackBtn').onclick=()=>{
 };
 
 $('startPlayBtn').onclick=()=>{
-  // Unlock audio/speech context on user interaction
+  // Wake up speech engine inside user gesture click handler to bypass mobile autoplay blocks
   if('speechSynthesis' in window) {
     window.speechSynthesis.cancel();
-    const dummy = new SpeechSynthesisUtterance('');
-    window.speechSynthesis.speak(dummy);
+    const wakeUp = new SpeechSynthesisUtterance(' ');
+    wakeUp.volume = 0;
+    window.speechSynthesis.speak(wakeUp);
   }
   
   inActiveGameSession=true;
