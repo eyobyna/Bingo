@@ -182,7 +182,8 @@ button.btn:disabled{opacity:.45}
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
   import { getDatabase, ref, child, get } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
 
-  const firebaseConfig = {
+  // FIREBASE_CONFIG integrated to bypass setup warning
+  const FIREBASE_CONFIG = {
     apiKey: "AIzaSyBZtealdtm83Ve_7BZG2QBL_n9DY29hjy8",
     authDomain: "bingo-83229.firebaseapp.com",
     databaseURL: "https://bingo-83229-default-rtdb.firebaseio.com/",
@@ -190,7 +191,7 @@ button.btn:disabled{opacity:.45}
     appId: "1:395054581766:web:ed97ee344841ff17e79b87"
   };
 
-  const firebaseApp = initializeApp(firebaseConfig);
+  const firebaseApp = initializeApp(FIREBASE_CONFIG);
   const db = getDatabase(firebaseApp);
 
   const tg = window.Telegram && Telegram.WebApp;
